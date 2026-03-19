@@ -1,137 +1,446 @@
+/* 글로벌 CSS 파일 전체 덮어쓰기 */
+
+/* 기본 리셋 및 배경 */
 body {
     margin: 0;
-    background: #EEF2F7;
-    font-family: system-ui, -apple-system, sans-serif;
+    /* 데스크톱 배경 유지 */
+    background-color: #1F2937;
+    /* body flex 삭제: Root에서 처리 */
+    display: block;
+    min-height: 100vh;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
-/* 컨테이너 */
-.container {
-    max-width: 420px;
-    margin: 0 auto;
-    padding: 28px 20px;
-    text-align: center;
-}
-
-/* 타이틀 */
-.title {
-    font-size: 28px;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 8px;
-}
-
-/* 설명 */
-.subtitle {
-    font-size: 18px;
-    color: #6B7280;
-    margin-bottom: 24px;
-}
-
-/* 버튼 공통 */
-.primary-btn {
+/* 앱 컨테이너 (모바일 뷰 최적화) */
+#root {
     width: 100%;
-    border: none;
-    border-radius: 14px;
-    padding: 16px;
+    /* max-width 제거: 모바일에서 꽉 찬 화면 구현 */
+    max-width: none; 
+    background-color: #F9FAFB;
+    min-height: 100vh;
+    /* 모바일에서는 그림자 불필요 */
+    box-shadow: none;
+    position: relative;
+    overflow-x: hidden;
+    /* 수직 중앙 정렬을 위한 Flexbox 설정 추가 */
+    display: flex;
+    justify-content: center; /* 데스크톱 중앙 정렬 */
+}
+
+/* 💻 데스크톱 전용 반응형 미디어 쿼리 추가 (421px 이상일 때) */
+@media (min-width: 421px) {
+    #root {
+        /* 데스크톱에서는 기존처럼 고정 폭 및 그림자 부활 */
+        max-width: 420px;
+        margin: 0 auto; /* 데스크톱 중앙 배치 */
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+    }
+}
+
+/* 내부 컨테이너 (Full-Screen & Vertical Centering) */
+.container {
+    width: 100%;
+    box-sizing: border-box;
+    /* 상단 패딩 증가: 상태 바/노치와 간격 확보 */
+    padding: 60px 24px 40px 24px;
+    /* text-align: center 삭제. Flex로 중앙 처리 */
+    /* text-align: center; */
+    
+    /* 💥 콘텐츠 수직 중앙 정렬을 위한 Flex 설정 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 수직 중앙 */
+    align-items: center; /* 수평 중앙 */
+    min-height: 100vh; /* 컨테이너 자체가 꽉 차게 */
+}
+
+/* 텍스트 타이포그래피 */
+.title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+    width: 100%; /* 너비 꽉 차게 */
+}
+
+.subtitle {
+    font-size: 16px;
+    font-weight: 500;
+    color: #6B7280;
+    margin-bottom: 32px;
+    line-height: 1.5;
+    word-break: keep-all;
+    width: 100%;
+}
+
+/* 질문 옵션 컨테이너 */
+.options {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+}
+
+/* 단일 선택 버튼 (디자인 완전 개편: 보더 기반) */
+.option-btn {
+    width: 100%;
+    background-color: #FFFFFF;
+    border: 2px solid #E5E7EB;
+    border-radius: 16px;
+    padding: 18px 16px;
     font-size: 16px;
     font-weight: 600;
+    color: #374151;
     cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.option-btn:hover {
+    border-color: #D1D5DB;
+    background-color: #F9FAFB;
+}
+
+.option-btn:active {
+    transform: scale(0.98);
+}
+
+/* 단일 선택됨 (신뢰감 있는 블루톤) */
+.option-btn.selected {
+    background-color: #EFF6FF;
+    border-color: #3B82F6;
+    color: #1D4ED8;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+/* 다중 선택 (체크박스) 버튼 */
+.checkbox-option {
+    position: relative; /* 중요: 체크 아이콘의 기준점이 됨 */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 글자 정중앙 정렬 */
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #FFFFFF;
+    border: 2px solid #E5E7EB;
+    border-radius: 16px;
+    padding: 18px 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.checkbox-option input {
+    display: none;
+}
+
+.checkbox-option:hover {
+    border-color: #D1D5DB;
+}
+
+/* 다중 선택됨 */
+.checkbox-option.selected {
+    background-color: #EFF6FF;
+    border-color: #3B82F6;
+    color: #1D4ED8;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+/* 텍스트 컨테이너 */
+.label-text {
+    text-align: center;
+    width: 100%;
+}
+
+/* 체크 아이콘 (우측 고정) */
+.check-icon {
+    position: absolute;
+    right: 20px; /* 글자 가운데 정렬을 방해하지 않고 우측에 고정 */
+    font-size: 18px;
+    font-weight: bold;
+    color: #2563EB;
+}
+
+/* 공통 액션 버튼 (다음, 처음으로 등) */
+.primary-btn {
+    width: 100%;
+    background-color: #1F2937; /* 다크 그레이로 묵직하게 */
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 18px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.primary-btn:hover {
+    background-color: #111827;
+    transform: translateY(-2px);
+}
+
+.primary-btn:active {
+    transform: translateY(0);
+}
+
+/* 위치 기반 버튼 (Primary 블루) */
+.location-btn {
+    background-color: #2563EB;
     margin-bottom: 12px;
 }
 
-/* 카드 리스트 */
-.age-list {
-    margin-top: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+.location-btn:hover {
+    background-color: #1D4ED8;
 }
 
-/* 카드 */
+/* 응급 버튼 (레드 포인트) */
+.emergency-btn {
+    background-color: #EF4444;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.emergency-btn:hover {
+    background-color: #DC2626;
+}
+
+/* 하단 버튼 영역 간격 */
+.btn-area {
+    margin-top: 32px;
+    width: 100%; /* 너비 꽉 차게 */
+}
+
+/* 홈 화면 연령 선택 카드 */
+.age-list {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%; /* 너비 꽉 차게 */
+}
+
 .age-card {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    gap: 18px;
-    background: white;
-    padding: 18px 20px;
+    background: #FFFFFF;
+    padding: 20px;
     border-radius: 16px;
-    border: 1px solid #E5E7EB;
+    border: 2px solid #E5E7EB;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .age-card:hover {
-    background: #F9FAFB;
+    border-color: #2563EB;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+}
+
+.age-icon {
+    font-size: 32px;
+    margin-right: 20px;
 }
 
 .age-text {
     display: flex;
-    align-items: center;
-    gap: 5px;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
-/* 아이콘 */
-.age-icon {
-    font-size: 38px;
-    width: 20px;
-    text-align: center;
-    padding: 0 35px;
-}
-
-/* 텍스트 */
 .age-label {
-    font-size: 16px;
-    font-weight: 600;
-    color: #374151;
+    font-size: 18px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 4px;
 }
 
 .age-desc {
-    font-size: 16px;
-    font-weight: 600;
-    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6B7280;
 }
 
-.btn-area {
-    margin-top: 40px;
-}
-
-.location-btn {
-    width: 100%;
-    background: rgb(90, 135, 233);
-    color: white;
-    border: none;
-    border-radius: 14px;
-    padding: 16px;
-    font-size: 16px;
-    font-weight: 600;
+/* Result 페이지 결과 카드 */
+.result-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    border: 1px solid #E5E5E7;
+    padding: 24px 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
     margin-bottom: 24px;
-    cursor: pointer;
+    text-align: left;
+    width: 100%; /* 너비 꽉 차게 */
+    box-sizing: border-box;
 }
 
-.location-btn:hover {
-    background: rgb(90, 135, 233);
+.result-card-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: #111827;
 }
 
-.emergency-btn {
+.result-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 
-    width: 100%;
+.result-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #F3F4F6;
+}
 
-    background: #f06464;
-    color: white;
+.result-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
 
-    border: none;
-    border-radius: 14px;
+.jp-text {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: #111827;
+    word-break: keep-all;
+    line-height: 1.4;
+}
 
+.kr-text {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6B7280;
+}
+
+/* 면책 조항 */
+.disclaimer-box {
+    background-color: #FEF2F2;
+    border: 1px solid #FCA5A5;
+    border-radius: 12px;
     padding: 16px;
-
-    font-size: 16px;
-    font-weight: 600;
-
-    margin-bottom: 12px;
-
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    text-align: left;
+    width: 100%; /* 너비 꽉 차게 */
+    box-sizing: border-box;
 }
 
-.emergency-btn:hover {
-    background: #f06464;
+.alert-icon {
+    font-size: 20px;
+    line-height: 1.2;
+}
+
+.disclaimer-box p {
+    margin: 0;
+    font-size: 13px;
+    color: #991B1B;
+    line-height: 1.5;
+    font-weight: 600;
+}
+
+/* --- [교체] 기존 .app-header 스타일 수정 --- */
+.app-header {
+    width: 100%;
+    max-width: 420px; /* 데스크톱 중앙 정렬 유지 */
+    height: 60px; /* 헤더 높이 고정 */
+    background-color: #FFFFFF; /* 깨끗한 화이트로 고정 */
+    
+    /* [💥수정: Flexbox 구조] 양끝으로 찢기 */
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; /* 수직 중앙 */
+    
+    padding: 0 20px; /* 좌우 여백 살짝 조정 */
+    box-sizing: border-box;
+    position: fixed; /* 상단 고정 */
+    top: 0;
+    z-index: 100; /* 콘텐츠 위에 배치 */
+    
+    /* 데스크톱 중앙 정렬을 위한 설정 */
+    left: 50%;
+    transform: translateX(-50%);
+
+    /* [💥추가: 헤더 구분선] 얇은 그레이 하단 보더 */
+    border-bottom: 1px solid #E5E7EB; 
+    
+    /* 그림자 살짝 주어 입체감 확보 (선택사항, 마음에 안 들면 제거) */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+/* 모바일 환경에서는 꽉 차게 */
+@media (max-width: 420px) {
+    .app-header {
+        max-width: none;
+        left: 0;
+        transform: none;
+    }
+}
+
+/* --- [추가/교체] 헤더 내부 요소 스타일 --- */
+
+/* 왼쪽, 중앙, 오른쪽 영역 공통 flex 설정 */
+.header-left, .header-center, .header-right {
+    display: flex;
+    align-items: center;
+    flex: 1; /* 세 영역이 균등한 너비를 가지도록 함 (중앙 정렬을 위해) */
+}
+
+/* 왼쪽 정렬 */
+.header-left {
+    justify-content: flex-start;
+}
+
+/* 오른쪽 정렬 */
+.header-right {
+    justify-content: flex-end;
+}
+
+/* [교체] 헤더 내 뒤로가기 버튼 수정 */
+.back-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6B7280; /* 차분한 그레이 */
+    font-size: 15px; /* 글자 크기 살짝 줄임 */
+    font-weight: 600;
+    padding: 8px 0; /* 터치 영역 확보 */
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px; /* 아이콘과 글자 사이 간격 */
+}
+
+.back-btn:hover {
+    color: #111827; /* 호버 시 진하게 */
+}
+
+/* [추가] 헤더 내 햄버거 메뉴 버튼 스타일 */
+.menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #374151; /* 약간 진한 그레이 */
+    font-size: 24px; /* 아이콘 크기 크게 */
+    padding: 8px; /* 터치 영역 확보 */
+    line-height: 1; /* 아이콘 높이 정렬 */
+    transition: color 0.2s ease;
+}
+
+.menu-btn:hover {
+    color: #2563EB; /* 호버 시 브랜드 블루로 변경 */
 }

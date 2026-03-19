@@ -2,7 +2,7 @@ function AgeCard({ age, onSelect }) {
     return (
         <div
             className="age-card"
-            onClick={() => onSelect(age.label)}
+            onClick={() => onSelect(age.id)}
         >
             <div className="age-icon">
                 {age.icon}
