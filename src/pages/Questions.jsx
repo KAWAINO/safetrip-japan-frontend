@@ -50,13 +50,13 @@ function Questions() {
             ...answers,
             [currentQuestion.id]: option.value
         };
-        
+
         // 2. 상태 업데이트 (이전 상태 prev를 참조하여 안전하게 업데이트)
         setAnswers(prev => ({
             ...prev,
             [currentQuestion.id]: option.value
         }));
-        
+
         // 3. 계산된 상태를 가지고 다음으로 이동
         goNext(nextAnswers);
     };
@@ -83,28 +83,63 @@ function Questions() {
     };
 
     // 다음 질문 이동
-    const goNext = (nextAnswers = answers) => {
-        const nextIndex = currentIndex + 1;
+    const goNext = () => {
+        let nextIndex = currentIndex + 1;
+
+        // 다음 질문들에 조건이 걸려있는지 확인하고, 조건에 안 맞으면 건너뛰기 로직
+        while (nextIndex < ageQuestions.length) {
+            const nextQ = ageQuestions[nextIndex];
+
+            if (!nextQ.condition) break; // 조건이 없으면 이 질문에서 스톱 (화면에 띄움)
+
+            // 조건이 있다면, 사용자가 앞서 선택한 답변과 비교
+            const dependsOnAnswer = answers[nextQ.condition.dependsOn];
+
+            // dependsOnAnswer가 배열일 수도 있고(다중선택), 단일 값일 수도 있음
+            const hasMatchingValue = Array.isArray(dependsOnAnswer)
+                ? nextQ.condition.values.some(v => dependsOnAnswer.includes(v))
+                : nextQ.condition.values.includes(dependsOnAnswer);
+
+            if (hasMatchingValue) {
+                break; // 조건에 맞으면 이 질문에서 스톱 (화면에 띄움)
+            }
+
+            // 조건에 안 맞으면 그 다음 질문(nextIndex++)으로 조용히 넘어감
+            nextIndex++;
+        }
 
         if (nextIndex < ageQuestions.length) {
             setCurrentIndex(nextIndex);
         } else {
-            // 모든 질문 완료 시 결과 페이지로 이동 (state 전달 유지)
-            navigate("/result", {
-                state: {
-                    ageId,
-                    answers: nextAnswers 
-                }
-            });
+            // 마지막 질문이면 결과 페이지로 이동
+            navigate(`/result/${ageId}`, { state: { answers } });
         }
     };
 
-    // 이전 질문 이동 (객체 구조 덕분에 이전 답변 상태가 그대로 유지됨)
+    // 이전 질문으로 가기 (조건 검사 포함)
     const goPrev = () => {
-        if (currentIndex > 0) {
-            setCurrentIndex(currentIndex - 1);
+        let prevIndex = currentIndex - 1;
+
+        // 이전으로 돌아갈 때도 조건에 안 맞는 질문은 건너뛰고 뒤로 가야 함
+        while (prevIndex >= 0) {
+            const prevQ = ageQuestions[prevIndex];
+
+            if (!prevQ.condition) break;
+
+            const dependsOnAnswer = answers[prevQ.condition.dependsOn];
+            const hasMatchingValue = Array.isArray(dependsOnAnswer)
+                ? prevQ.condition.values.some(v => dependsOnAnswer.includes(v))
+                : prevQ.condition.values.includes(dependsOnAnswer);
+
+            if (hasMatchingValue) {
+                break;
+            }
+            prevIndex--;
+        }
+
+        if (prevIndex >= 0) {
+            setCurrentIndex(prevIndex);
         } else {
-            // 첫 질문에서 뒤로가기 시, 백업된 데이터를 지우고 홈으로 이동
             sessionStorage.removeItem(`answers_${ageId}`);
             sessionStorage.removeItem(`currentIndex_${ageId}`);
             navigate(-1);

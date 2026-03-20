@@ -5,6 +5,8 @@ import Question from "./pages/Questions";
 import Result from "./pages/result";
 import Emergency from "./pages/Emergency";
 import Hospitals from "./pages/Hospitals";
+import Pharmacies from './pages/Pharmacies';
+import MedicineGuide from './pages/MedicineGuide';
 
 function App() {
   return (
@@ -12,9 +14,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/question/:ageId" element={<Question />} />
-        <Route path="/result" element={<Result />} />
+        <Route path="/result/:ageId" element={<Result />} />
         <Route path="/emergency" element={<Emergency />} />
         <Route path="/hospitals" element={<Hospitals />} />
+        <Route path="/pharmacies" element={<Pharmacies />} />
+        <Route path="/medicine-guide" element={<MedicineGuide />} />
       </Routes>
     </BrowserRouter>
   );

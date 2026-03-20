@@ -13,13 +13,13 @@ function Result() {
         if (location.state && location.state.ageId && location.state.answers) {
             return location.state;
         }
-        
+
         const under1Answers = sessionStorage.getItem("answers_under1");
         const over1Answers = sessionStorage.getItem("answers_over1");
-        
+
         if (under1Answers) return { ageId: "under1", answers: JSON.parse(under1Answers) };
         if (over1Answers) return { ageId: "over1", answers: JSON.parse(over1Answers) };
-        
+
         return null;
     });
 
@@ -29,51 +29,62 @@ function Result() {
         }
     }, [resultData, navigate]);
 
+    // 💥 [수정됨] answers 객체 기반으로 번역된 결과 리스트 생성
     const translatedResults = useMemo(() => {
-        if (!resultData) return [];
-        const { ageId, answers } = resultData;
-        const currentQuestions = questions[ageId];
+        // resultData가 없거나 해당 연령의 질문 데이터가 없으면 빈 배열 반환
+        if (!resultData || !questions[resultData.ageId]) return [];
+
+        // resultData에서 현재 연령대의 질문 배열과, 사용자의 답변 객체를 꺼내옴
+        const ageQuestions = questions[resultData.ageId];
+        const answers = resultData.answers;
         const results = [];
 
-        currentQuestions.forEach(q => {
-            const answer = answers[q.id];
-            if (!answer) return;
+        // ageQuestions 배열을 돌면서 번역 데이터 매칭
+        ageQuestions.forEach((q) => {
+            const answerVal = answers[q.id];
 
-            if (Array.isArray(answer)) {
-                answer.forEach(val => {
-                    const option = q.options.find(opt => opt.value === val);
-                    if (option && option.jp) results.push({ kr: option.label, jp: option.jp });
+            // 💥 [핵심 안전장치] 스킵되었거나 답변이 없는 경우 무시
+            if (!answerVal || (Array.isArray(answerVal) && answerVal.length === 0)) {
+                return;
+            }
+
+            if (Array.isArray(answerVal)) { // 다중 선택
+                answerVal.forEach(val => {
+                    const option = q.options.find(o => o.value === val);
+                    if (option && option.jp) {
+                        results.push({ kr: option.label, jp: option.jp });
+                    }
                 });
-            } else {
-                const option = q.options.find(opt => opt.value === answer);
-                if (option && option.jp) results.push({ kr: option.label, jp: option.jp });
+            } else { // 단일 선택
+                const option = q.options.find(o => o.value === answerVal);
+                if (option && option.jp) {
+                    results.push({ kr: option.label, jp: option.jp });
+                }
             }
         });
 
         return results;
-    }, [resultData]);
+    }, [resultData]); // 의존성 배열에 resultData 추가
 
     const handleGoHome = () => {
         sessionStorage.clear();
         navigate("/");
     };
 
-    // [신규 로직] 클립보드 복사 함수
+    // 클립보드 복사 함수
     const handleCopy = async () => {
         if (translatedResults.length === 0) return;
 
-        // 클립보드에 들어갈 텍스트 포맷팅 (일본어 위주로 작성)
         const textToCopy = translatedResults
             .map(item => `• ${item.jp} (${item.kr})`)
             .join('\n');
-            
+
         const fullText = `[症状のまとめ / 증상 요약]\n${textToCopy}`;
 
         try {
             await navigator.clipboard.writeText(fullText);
-            setIsCopied(true); // 복사 성공 시 상태 변경
-            
-            // 2초 후 원래 버튼 텍스트로 복구
+            setIsCopied(true);
+
             setTimeout(() => {
                 setIsCopied(false);
             }, 2000);
@@ -88,11 +99,11 @@ function Result() {
     return (
         <div className="container">
             <h2 className="title">의사에게 보여주세요</h2>
-            
+
             <div className="disclaimer-box">
                 <span className="alert-icon">⚠️</span>
-                <p>본 번역은 소통 보조용이며, 의학적 진단을 대체하지 않습니다.<br/>
-                (この翻訳はコミュニケーション補助用であり、医学的診断に代わるものではありません。)</p>
+                <p>본 번역은 소통 보조용이며, 의학적 진단을 대체하지 않습니다.<br />
+                    (この翻訳はコミュニケーション補助用であり、医学的診断に代わるものではありません。)</p>
             </div>
 
             <div className="result-card">
@@ -100,9 +111,9 @@ function Result() {
                     <h3 className="result-card-title" style={{ border: "none", margin: 0, padding: 0 }}>
                         증상 요약 (症状のまとめ)
                     </h3>
-                    
-                    {/* [신규 UI] 복사 버튼 */}
-                    <button 
+
+                    {/* 복사 버튼 */}
+                    <button
                         onClick={handleCopy}
                         style={{
                             background: isCopied ? "#10B981" : "#F3F4F6",
@@ -119,7 +130,7 @@ function Result() {
                         {isCopied ? "✓ 복사 완료" : "📋 텍스트 복사"}
                     </button>
                 </div>
-                
+
                 {translatedResults.length === 0 ? (
                     <p className="empty-text">선택된 증상이 없습니다.</p>
                 ) : (
@@ -135,14 +146,30 @@ function Result() {
             </div>
 
             <div className="btn-area">
-                <button 
+                <button
                     className="primary-btn location-btn"
-                    onClick={() => navigate("/hospitals")}
+                    onClick={() => navigate('/hospitals')}
                 >
-                    📍 근처 병원 찾기
+                    📍 내 주변 병원 찾기
                 </button>
-                
-                <button 
+
+                <button
+                    className="primary-btn location-btn"
+                    style={{ backgroundColor: '#10B981', marginBottom: '12px' }}
+                    onClick={() => navigate('/pharmacies')}
+                >
+                    💊 근처 약국 / 드럭스토어 찾기
+                </button>
+
+                <button
+                    className="primary-btn"
+                    style={{ backgroundColor: '#F59E0B', color: 'white', marginBottom: '12px' }}
+                    onClick={() => navigate('/medicine-guide')}
+                >
+                    🎒 일본 어린이 상비약 도감 보기
+                </button>
+
+                <button
                     className="primary-btn"
                     style={{ backgroundColor: "#E5E7EB", color: "#4B5563" }}
                     onClick={handleGoHome}

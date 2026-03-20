@@ -1,0 +1,79 @@
+/* 카드 전체 스타일 (border, shadow, rounded corners) */
+.pharmacy-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    border: 1px solid #E5E5E7;
+    padding: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    margin-bottom: 20px;
+    text-align: left;
+    box-sizing: border-box;
+    /* 카드 내부 요소를 수직으로 배치 */
+    display: flex;
+    flex-direction: column; 
+    gap: 16px; /* 버튼과 정보 영역 사이 간격 */
+}
+
+/* 상단 정보 영역 layout */
+.pharmacy-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* 아이콘 스타일 */
+.pharmacy-icon {
+    font-size: 28px;
+}
+
+/* 이름과 상태 정보 */
+.pharmacy-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.pharmacy-name {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.4;
+}
+
+.pharmacy-status {
+    margin: 4px 0 0 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6B7280;
+}
+
+/* [💥핵심: 개편된 길찾기 버튼] 병원 카드 버튼처럼 크고 깔끔하게 */
+.google-maps-btn {
+    width: 100%; /* 하단 꽉 차게 */
+    background-color: #2563EB; /* 병원 버튼과 동일한 블루 */
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 아이콘과 텍스트를 중앙 정렬 */
+    gap: 8px; /* 아이콘과 텍스트 사이 간격 */
+    margin: 0;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15); /* 블루 그림자 추가 */
+}
+
+.google-maps-btn:hover {
+    background-color: #1D4ED8; /* 호버 시 진해짐 */
+    transform: translateY(-2px); /* 살짝 떠오르는 효과 */
+}
+
+.google-maps-btn:active {
+    transform: translateY(0); /* 클릭 시 원복 */
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+}
