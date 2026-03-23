@@ -52,19 +52,20 @@ export const questions = {
       ]
     },
     // 💥 [개편됨] 2. 대변 색상 질문 (조건부)
+    // src/data/questions.js 내부의 stool_color 질문 수정 (under1, over1 모두 적용)
     {
       id: 'stool_color',
       type: 'single',
+      uiType: 'colorPalette', // 💥 [핵심] 이 질문은 팔레트 UI로 그리라고 프론트에 알려줌
       question: '대변의 색깔은 어떤가요?',
-      // '오늘 아직 안 봄'을 선택하지 않은 경우에만 색깔을 물어봄
       condition: { dependsOn: 'stool_condition', values: ['normal', 'soft', 'diarrhea', 'hard'] },
       options: [
-        { label: '🟡 노란색 / 황금색', value: 'yellow', jp: "便の色は黄色（黄金色）です。" },
-        { label: '🟤 갈색 / 진갈색', value: 'brown', jp: "便の色は茶色です。" },
-        { label: '🟢 녹색', value: 'green', jp: "便の色は緑色です。" },
-        { label: '🔴 빨간색 (피 섞임)', value: 'red', jp: "赤色の便（血便）が出ました。" },
-        { label: '⚪ 하얀색 / 크림색', value: 'white', jp: "白色（クリーム色）の便が出ました。" },
-        { label: '⚫ 검은색 (짜장면색)', value: 'black', jp: "黒色の便が出ました。" }
+        { label: '노란색', value: 'yellow', jp: "便の色は黄色（黄金色）です。", colorCode: '#FBBF24' },
+        { label: '갈색', value: 'brown', jp: "便の色は茶色です。", colorCode: '#78350F' },
+        { label: '녹색', value: 'green', jp: "便の色は緑色です。", colorCode: '#4ADE80' },
+        { label: '빨간색(피)', value: 'red', jp: "赤色の便（血便）が出ました。", colorCode: '#EF4444' },
+        { label: '하얀색/크림', value: 'white', jp: "白色（クリーム色）の便が出ました。", colorCode: '#F9FAFB' },
+        { label: '검은색', value: 'black', jp: "黒色の便が出ました。", colorCode: '#1F2937' }
       ]
     },
     {
