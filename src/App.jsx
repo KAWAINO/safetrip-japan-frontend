@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
 import Question from "./pages/Questions";
-import Result from "./pages/result";
+import Result from "./pages/Result";
 import Emergency from "./pages/Emergency";
 import Hospitals from "./pages/Hospitals";
 import Pharmacies from './pages/Pharmacies';
