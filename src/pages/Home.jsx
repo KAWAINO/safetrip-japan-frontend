@@ -121,8 +121,8 @@ function Home() {
                 )}
 
                 {/* 하단 공통 응급 버튼 */}
-                <div style={{ marginTop: '40px', width: '100%' }}>
-                    <button className="danger-btn" onClick={() => navigate('/emergency')}>
+                <div className="btn-area" style={{ marginTop: '40px', width: '100%' }}>
+                    <button className="primary-btn emergency-btn" onClick={() => navigate('/emergency')}>
                         🚨 응급 상황 (119 구급차)
                     </button>
                 </div>
