@@ -7,12 +7,14 @@ import Emergency from "./pages/Emergency";
 import Hospitals from "./pages/Hospitals";
 import Pharmacies from './pages/Pharmacies';
 import MedicineGuide from './pages/MedicineGuide';
+import PharmacySpeed from './pages/PharmacySpeed';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/pharmacy-speed" element={<PharmacySpeed />} />
         <Route path="/question/:ageId" element={<Question />} />
         <Route path="/result/:ageId" element={<Result />} />
         <Route path="/emergency" element={<Emergency />} />
