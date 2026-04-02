@@ -8,7 +8,6 @@ import Hospitals from "./pages/Hospitals";
 import Pharmacies from './pages/Pharmacies';
 import MedicineGuide from './pages/MedicineGuide';
 import PharmacySpeed from './pages/PharmacySpeed';
-import './App.css';
 
 function App() {
   return (
