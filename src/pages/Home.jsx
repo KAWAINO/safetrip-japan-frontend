@@ -36,7 +36,7 @@ function Home() {
                         </div>
 
                         {/* 성인 / 소아 버튼 디자인 통일 */}
-                        <button className="target-btn" onClick={() => navigate('/pharmacy-speed')}>
+                        <button className="target-btn" onClick={() => navigate('/pharmacy-speed', { state: { type: 'adult' } })}>
                             <span className="emoji-icon">👩</span> 성인 (본인 및 동행자)
                         </button>
 
@@ -59,7 +59,7 @@ function Home() {
                             <span>소아과 진료 (정밀 문진)</span>
                         </button>
 
-                        <button className="action-btn pharmacy-btn" onClick={() => navigate('/pharmacy-speed')}>
+                        <button className="action-btn pharmacy-btn" onClick={() => navigate('/pharmacy-speed', { state: { type: 'child' } })}>
                             <span className="emoji-icon-large">💊</span>
                             <span>약국 / 드럭스토어 (간편 소통)</span>
                         </button>

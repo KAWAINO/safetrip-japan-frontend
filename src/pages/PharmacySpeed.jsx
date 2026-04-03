@@ -1,20 +1,23 @@
 // src/pages/PharmacySpeed.jsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // 💡 useLocation 추가!
 import Header from '../components/Header';
-
-// 약국용 스피드 질문 데이터
-const speedCards = [
-    { id: 'fever', icon: '🌡️', kr: '어린이 해열제는 어디 있나요?', jp: '子供用の解熱剤はどこですか？' },
-    { id: 'cold', icon: '🤧', kr: '어린이 감기약(기침/콧물) 주세요.', jp: '子供用の風邪薬（咳・鼻水）をください。' },
-    { id: 'stomach', icon: '💩', kr: '어린이 정장제(설사약) 있나요?', jp: '子供用の整腸剤（下痢止め）はありますか？' },
-    { id: 'bug', icon: '🦟', kr: '벌레 물린 데 바르는 연고 주세요.', jp: '虫刺されの薬（塗り薬）をください。' },
-    { id: 'wound', icon: '🩹', kr: '어린이용 상처 밴드/소독약 어딨나요?', jp: '子供用の絆創膏と消毒液はどこですか？' }
-];
+import { pharmacyData } from '../data/pharmacyData'; // 💡 분리한 데이터 불러오기!
 
 function PharmacySpeed() {
     const navigate = useNavigate();
+    const location = useLocation(); // 수하물(쪽지) 확인하는 도구
     const [selectedCard, setSelectedCard] = useState(null);
+    const [selectedSub, setSelectedSub] = useState(null);
+
+    // 💡 Home에서 넘겨준 쪽지(type)를 확인. 쪽지가 없으면(ex. 주소창으로 직접 접속) 기본값으로 'adult' 설정
+    const userType = location.state?.type || 'adult';
+    
+    // 💡 쪽지 내용에 따라 보여줄 데이터를 adult 또는 child 중에서 골라옴!
+    const speedCards = pharmacyData[userType];
+
+    const finalJp = selectedSub ? selectedSub.jp : (selectedCard?.displayJp || selectedCard?.jp);
+    const finalKr = selectedSub ? `(${selectedSub.label}용)` : `(${selectedCard?.desc})`;
 
     return (
         <>
@@ -26,58 +29,94 @@ function PharmacySpeed() {
                     찾으시는 약을 선택하면 일본어 화면이 크게 표시됩니다.
                 </p>
 
-                {/* 플래시 카드 뷰 (선택된 카드가 크게 표시됨) */}
-                {selectedCard ? (
-                    <div style={{ 
-                        backgroundColor: '#FEF2F2', border: '2px solid #EF4444', 
-                        borderRadius: '16px', padding: '30px 20px', textAlign: 'center', 
-                        marginBottom: '24px', boxShadow: '0 4px 12px rgba(239, 68, 68, 0.1)' 
-                    }}>
-                        <span style={{ fontSize: '40px', display: 'block', marginBottom: '12px' }}>{selectedCard.icon}</span>
-                        <h1 style={{ fontSize: '24px', fontWeight: '900', color: '#111827', margin: '0 0 12px 0', wordBreak: 'keep-all' }}>
-                            {selectedCard.jp}
-                        </h1>
-                        <p style={{ color: '#6B7280', fontSize: '15px', margin: 0 }}>({selectedCard.kr})</p>
-                    </div>
-                ) : (
-                    <div style={{ 
-                        backgroundColor: '#F3F4F6', borderRadius: '16px', padding: '40px 20px', 
-                        textAlign: 'center', marginBottom: '24px', color: '#9CA3AF' 
-                    }}>
-                        아래에서 필요한 약을 선택하세요.
-                    </div>
-                )}
+                <div style={{ 
+                    backgroundColor: '#FEF2F2', border: '2px solid #EF4444', 
+                    borderRadius: '16px', padding: '30px 20px', textAlign: 'center', 
+                    marginBottom: '24px', boxShadow: '0 4px 12px rgba(239, 68, 68, 0.1)',
+                    minHeight: '160px', display: 'flex', flexDirection: 'column', justifyContent: 'center'
+                }}>
+                    {selectedCard ? (
+                        <>
+                            <span style={{ fontSize: '40px', display: 'block', marginBottom: '12px' }}>
+                                {selectedCard.icon}
+                            </span>
+                            <h1 style={{ 
+                                fontSize: '24px', fontWeight: '900', color: '#111827', 
+                                margin: '0 0 12px 0', wordBreak: 'break-word', lineHeight: '1.4' 
+                            }}>
+                                {finalJp}
+                            </h1>
+                            <p style={{ color: '#6B7280', fontSize: '15px', margin: 0 }}>
+                                {selectedCard.kr} {finalKr}
+                            </p>
+                        </>
+                    ) : (
+                        <p style={{ color: '#9CA3AF', margin: 0 }}>아래에서 필요한 약 종류를 선택하세요.</p>
+                    )}
+                </div>
 
-                {/* 증상 선택 버튼 그리드 */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '32px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '24px' }}>
                     {speedCards.map(card => (
                         <button 
                             key={card.id}
-                            onClick={() => setSelectedCard(card)}
+                            onClick={() => {
+                                setSelectedCard(card);
+                                setSelectedSub(null); // 에러 고쳤던 바로 그 부분!
+                            }}
                             style={{
-                                backgroundColor: selectedCard?.id === card.id ? '#10B981' : '#FFFFFF',
+                                backgroundColor: selectedCard?.id === card.id ? '#1F2937' : '#FFFFFF',
                                 color: selectedCard?.id === card.id ? '#FFFFFF' : '#374151',
-                                border: selectedCard?.id === card.id ? 'none' : '1px solid #E5E7EB',
-                                borderRadius: '12px', padding: '16px', fontSize: '15px', fontWeight: '600',
-                                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
-                                boxShadow: '0 2px 4px rgba(0,0,0,0.02)', cursor: 'pointer', transition: 'all 0.2s'
+                                border: '1px solid #E5E7EB',
+                                borderRadius: '12px', padding: '12px 8px', fontSize: '13px', fontWeight: '700',
+                                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
+                                cursor: 'pointer', transition: 'all 0.2s'
                             }}
                         >
-                            <span style={{ fontSize: '24px' }}>{card.icon}</span>
-                            <span>{card.kr.split(' ')[1]}</span> {/* '해열제는', '감기약(기침/콧물)' 등 키워드만 표시 */}
+                            <span style={{ fontSize: '22px' }}>{card.icon}</span>
+                            <span>{card.kr}</span>
                         </button>
                     ))}
                 </div>
 
-                {/* 직원이 못 알아들을 때를 대비한 도감 연결 */}
+                {selectedCard?.subSymptoms && (
+                    <div style={{ marginBottom: '32px', animation: 'fadeIn 0.3s ease' }}>
+                        <p style={{ fontSize: '14px', fontWeight: '800', color: '#374151', marginBottom: '12px' }}>
+                            💡 구체적으로 어디가 아픈가요?
+                        </p>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                            {selectedCard.subSymptoms.map(sub => (
+                                <button
+                                    key={sub.id}
+                                    onClick={() => setSelectedSub(sub)}
+                                    style={{
+                                        backgroundColor: selectedSub?.id === sub.id ? '#3B82F6' : '#EFF6FF',
+                                        color: selectedSub?.id === sub.id ? '#FFFFFF' : '#1D4ED8',
+                                        border: 'none', borderRadius: '10px', padding: '12px',
+                                        fontSize: '14px', fontWeight: '600', cursor: 'pointer'
+                                    }}
+                                >
+                                    {sub.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 <button 
                     className="primary-btn" 
                     style={{ backgroundColor: '#F59E0B', color: 'white', width: '100%' }}
                     onClick={() => navigate('/medicine-guide')}
                 >
-                    🎒 직원이 모른다면? 상비약 사진 보여주기
+                    🎒 사진으로 찾기 (상비약 도감)
                 </button>
             </div>
+
+            <style>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
         </>
     );
 }
