@@ -1,0 +1,137 @@
+/* =========================================
+   Home 페이지 전용 스타일
+   ========================================= */
+   .home-container {
+    padding-top: 40px;
+    padding-bottom: 40px;
+    justify-content: center;
+  }
+  
+  .step-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* 상단 설명 카드 */
+  .info-card {
+    background-color: #F9FAFB;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid #E5E7EB;
+    margin-bottom: 10px;
+  }
+  
+  .info-card h2 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 12px;
+    margin-top: 0;
+  }
+  
+  .info-card p {
+    font-size: 14px;
+    color: #4B5563;
+    line-height: 1.6;
+    margin: 0;
+  }
+  
+  /* 제목 영역 */
+  .title-area {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .title-area h1 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #111827;
+    margin: 0;
+  }
+  
+  .title-area p {
+    color: #6B7280;
+    margin-top: 8px;
+    margin-bottom: 0;
+    font-size: 15px;
+  }
+  
+  /* 대상 선택 버튼 (성인, 소아 동일 디자인) */
+  .target-btn {
+    height: 90px;
+    font-size: 18px;
+    font-weight: 600;
+    background-color: #FFFFFF;
+    color: #111827;
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  
+  .target-btn:active {
+    background-color: #F3F4F6;
+    border-color: #D1D5DB;
+  }
+  
+  /* 2단계: 목적지 버튼 (병원, 약국) */
+  .action-btn {
+    height: 100px;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.2s;
+  }
+  
+  .action-btn:active {
+    opacity: 0.8;
+  }
+  
+  .hospital-btn { background-color: #3B82F6; }
+  .pharmacy-btn { background-color: #10B981; }
+  
+  /* 3단계: 연령 선택 버튼 */
+  .age-btn {
+    height: 80px;
+    font-size: 18px;
+    font-weight: 600;
+    background-color: #F3F4F6;
+    color: #111827;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .age-btn:active {
+    background-color: #E5E7EB;
+  }
+  
+  /* 이모지 및 버튼 하단 여백 */
+  .emoji-icon {
+    font-size: 24px;
+    margin-right: 10px;
+  }
+  
+  .emoji-icon-large {
+    font-size: 28px;
+    margin-bottom: 4px;
+  }
+  
+  .home-emergency-area {
+    margin-top: 40px;
+    width: 100%;
+  }

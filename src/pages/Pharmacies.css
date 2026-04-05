@@ -1,0 +1,14 @@
+/* src/pages/Pharmacies.css */
+.night-alert {
+    background-color: #FEF3C7; border-color: #F59E0B;
+}
+.night-alert p { color: #B45309; }
+
+.day-alert {
+    background-color: #EFF6FF; border-color: #3B82F6;
+}
+.day-alert p { color: #1D4ED8; }
+
+.pharmacy-list-wrap {
+    width: 100%; margin-top: 24px;
+}

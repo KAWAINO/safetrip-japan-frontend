@@ -1,0 +1,36 @@
+/* src/pages/Emergency.css */
+.emergency-wrapper {
+    background-color: #FEF2F2;
+    min-height: 100vh;
+    padding-bottom: 40px;
+}
+.emergency-top {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+}
+.emergency-back {
+    background: none; border: none; cursor: pointer; color: #991B1B; font-size: 16px; font-weight: bold;
+}
+.emergency-main-title {
+    color: #991B1B; font-size: 28px; font-weight: 800; margin-bottom: 10px;
+}
+.emergency-desc {
+    color: #DC2626; font-size: 16px; font-weight: 600; margin-bottom: 30px;
+}
+.emergency-list {
+    display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; width: 100%;
+}
+.emergency-card {
+    background-color: white; padding: 20px; border-radius: 16px; border: 2px solid #FECACA; 
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
+}
+.emergency-jp {
+    margin: 0 0 8px 0; font-size: 22px; font-weight: 800; color: #111827; word-break: keep-all;
+}
+.emergency-kr {
+    margin: 0; font-size: 15px; font-weight: 600; color: #EF4444;
+}
+.call-btn {
+    display: block; width: 100%; background-color: #DC2626; color: white; text-align: center; 
+    padding: 20px; border-radius: 16px; font-size: 20px; font-weight: 800; text-decoration: none; 
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.3); box-sizing: border-box;
+}
