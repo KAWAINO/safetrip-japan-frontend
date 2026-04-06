@@ -5,14 +5,22 @@ import Header from '../components/Header';
 import { pharmacyData } from '../data/pharmacyData';
 import './PharmacySpeed.css';
 
+// 💡 나이 번역용 사전 (Home에서 넘어온 텍스트를 일본어로 매핑)
+const ageJpMap = {
+    '1세 (12개월) 미만': '1歳（12ヶ月）未満',
+    '1세 이상 ~ 2세 미만': '1歳以上〜2歳（24ヶ月）未満',
+    '2세 (24개월) 이상': '2歳（24ヶ月）以上'
+};
+
 function PharmacySpeed() {
     const navigate = useNavigate();
     const location = useLocation();
     const [selectedCard, setSelectedCard] = useState(null);
-    
     const [selectedSubs, setSelectedSubs] = useState([]);
 
     const userType = location.state?.type || 'adult';
+    const ageLabel = location.state?.ageLabel || ''; // 💡 Home에서 넘어온 나이 정보
+    
     const speedCards = pharmacyData[userType];
 
     const finalJp = selectedCard?.displayJp || selectedCard?.jp;
@@ -36,12 +44,24 @@ function PharmacySpeed() {
                 <h2 className="title">직원에게 보여주세요.</h2>
                 <p className="speed-desc">찾으시는 약을 선택하면 일본어 화면이 크게 표시됩니다.</p>
 
+                {/* 💡 소아(child) 모드일 때만 나타나는 나이 안내 박스 */}
+                {userType === 'child' && ageLabel && (
+                    <div style={{ backgroundColor: '#EFF6FF', border: '2px solid #BFDBFE', borderRadius: '12px', padding: '16px', marginBottom: '24px', textAlign: 'left' }}>
+                        <p style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: '800', color: '#1D4ED8', wordBreak: 'keep-all', lineHeight: '1.4' }}>
+                            この方は子供用の薬を探しています。<br/>
+                            対象年齢：<span style={{ textDecoration: 'underline' }}>{ageJpMap[ageLabel] || ageLabel}</span>
+                        </p>
+                        <p style={{ margin: 0, fontSize: '13px', color: '#3B82F6', fontWeight: '600' }}>
+                            (이 사람은 아이의 약을 찾고 있습니다. 연령대는 {ageLabel}입니다.)
+                        </p>
+                    </div>
+                )}
+
                 <div className="flash-card">
                     {selectedCard ? (
                         <>
                             <p className="flash-title">以下の薬を探しています。<br/><span style={{fontSize:'12px', color:'#DC2626'}}>(아래의 약을 찾고 있습니다.)</span></p>
                             
-                            {/* 💡 다시 위아래로 시원하게 분리! */}
                             <span className="flash-icon">{selectedCard.icon}</span>
                             <h1 className="flash-jp">{finalJp}</h1>
                             

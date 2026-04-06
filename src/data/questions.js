@@ -122,7 +122,7 @@ export const questions = {
         { label: "기침", value: "cough", jp: "咳が出ます。" },
         { label: "콧물", value: "runny_nose", jp: "鼻水が出ます。" },
         { label: "구토", value: "vomit", jp: "嘔吐しました。" },
-        { label: "설사", value: "diarrhea", jp: "下痢をしています。" },
+        // { label: "설사", value: "diarrhea", jp: "下痢をしています。" },
         { label: "복통", value: "stomachache", jp: "お腹を痛がっています。" },
         { label: "발진/두드러기", value: "rash", jp: "発疹・じんましんがあります。" },
         { label: "해당 없음", value: "none", jp: "その他の症状はありません。" }

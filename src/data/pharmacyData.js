@@ -5,50 +5,51 @@ export const pharmacyData = {
         { 
             id: 'fever', icon: '🌡️', kr: '해열제', jp: '子供用の解熱剤はどこですか？', displayJp: '子供用の解熱剤をください。',
             subSymptoms: [
-                { id: 'head', label: '두통', jp: '頭痛があります。' },
-                { id: 'throat', label: '목 통증', jp: '喉の痛みがあります。' },
-                { id: 'muscle', label: '근육통/몸살', jp: '筋肉痛・寒気があります。' }
+                { id: 'low_fever', label: '미열이 조금 나요', jp: '熱が少しあります。' },
+                { id: 'high_fever', label: '열이 많이 나요', jp: '熱が高いです。' },
+                { id: 'crying', label: '아파서 보채고 울어요', jp: 'どこか痛いようで、ぐずって泣いています。' }
             ]
         },
         { 
             id: 'cold', icon: '🤧', kr: '감기약', jp: '子供用の風邪薬をください。', displayJp: '子供用の風邪薬をください。',
             subSymptoms: [
-                { id: 'throat', label: '목감기 (인후통)', jp: '喉の痛みがひどいです。' },
-                { id: 'nose', label: '코감기 (콧물/코막힘)', jp: '鼻水・鼻づまりがあります。' },
-                { id: 'cough', label: '기침 / 가래', jp: '咳・たんが出ます。' },
-                { id: 'fever', label: '열 동반', jp: '熱もあります。' }
+                { id: 'nose', label: '콧물이 나요', jp: '鼻水・鼻づまりがあります。' },
+                { id: 'cough', label: '기침을 해요', jp: '咳が出ます。' },
+                { id: 'phlegm', label: '가래 끓는 소리가 나요', jp: 'たんが絡むような音がします。' },
+                { id: 'chill', label: '추워해요 (오한)', jp: '寒がっています。' },
+                { id: 'fever', label: '열이 같이 나요', jp: '熱も一緒に出ています。' }
             ]
         },
         { 
             id: 'stomach', icon: '💩', kr: '배탈 / 정장제', displayJp: '子供用の整腸剤をください。',
             subSymptoms: [
-                { id: 'diarrhea', label: '설사', jp: '下痢をしています。' },
-                { id: 'vomit', label: '구토/메스꺼움', jp: '吐き気・嘔吐があります。' },
-                { id: 'pain', label: '복통', jp: 'お腹が痛いです。' }
+                { id: 'diarrhea', label: '설사를 해요', jp: '下痢をしています。' },
+                { id: 'vomit', label: '토를 했어요', jp: '嘔吐しました（吐きました）。' },
+                { id: 'pain', label: '배를 아파해요', jp: 'お腹を痛がっています。' }
             ]
         },
         { 
             id: 'skin', icon: '🧴', kr: '피부 연고', displayJp: '湿疹やかゆみに効く塗り薬をください。',
             subSymptoms: [
-                { id: 'itch', label: '가려움', jp: 'かゆみがひどいです。' },
-                { id: 'red', label: '붉어짐/발진', jp: '赤く腫れています。' },
-                { id: 'dry', label: '건조함', jp: 'カサカサに乾燥しています。' }
+                { id: 'itch', label: '가려운지 계속 긁어요', jp: 'かゆいようで、ずっと掻いています。' },
+                { id: 'red', label: '피부가 붉어졌어요 (발진)', jp: '皮膚が赤くなっています（発疹）。' },
+                { id: 'dry', label: '피부가 건조해서 터요', jp: '肌が乾燥してカサカサです。' }
             ]
         },
         { 
             id: 'wound', icon: '🩹', kr: '상처 / 소독', displayJp: '子供用の絆創膏と消毒液はどこですか？',
             subSymptoms: [
-                { id: 'cut', label: '베인 상처', jp: '切り傷です。' },
-                { id: 'scrape', label: '까진 상처', jp: 'すり傷です。' },
-                { id: 'burn', label: '화상', jp: 'やけどをしました。' }
+                { id: 'cut', label: '어딘가 베였어요', jp: 'どこかで切ってしまいました。' },
+                { id: 'scrape', label: '넘어져서 까졌어요', jp: '転んで擦りむきました。' },
+                { id: 'burn', label: '데였어요 (화상)', jp: 'やけどをしました。' }
             ]
         },
         { 
             id: 'bug', icon: '🦟', kr: '벌레 물린 데', displayJp: '虫刺されの塗り薬をください。',
             subSymptoms: [
-                { id: 'mosquito', label: '모기', jp: '蚊に刺されました。' },
-                { id: 'tick', label: '진드기/기타', jp: 'ダニや他の虫に刺されました。' },
-                { id: 'swell', label: '크게 부음', jp: '大きく腫れています。' }
+                { id: 'mosquito', label: '모기에 물렸어요', jp: '蚊に刺されました。' },
+                { id: 'tick', label: '벌레/진드기에 물렸어요', jp: '虫（またはダニ）に刺されました。' },
+                { id: 'swell', label: '물린 곳이 많이 부었어요', jp: '刺されたところが大きく腫れています。' }
             ]
         }
     ],
@@ -68,7 +69,9 @@ export const pharmacyData = {
                 { id: 'throat', label: '목감기 (인후통)', jp: '喉の痛みがひどいです。' },
                 { id: 'nose', label: '코감기 (콧물/코막힘)', jp: '鼻水・鼻づまりがあります。' },
                 { id: 'cough', label: '기침 / 가래', jp: '咳・たんが出ます。' },
-                { id: 'fever', label: '열 동반', jp: '熱もあります。' }
+                { id: 'fever', label: '열 동반', jp: '熱もあります。' },
+                // 💡 [추가 완료] 몸살 기운
+                { id: 'chill', label: '오한 / 몸살', jp: '寒気や体の痛みがあります。' }
             ]
         },
         { 
@@ -76,7 +79,9 @@ export const pharmacyData = {
             subSymptoms: [
                 { id: 'indigestion', label: '소화불량/체함', jp: '胃もたれ・消化不良です。' },
                 { id: 'heartburn', label: '속쓰림', jp: '胸やけがします。' },
-                { id: 'pain', label: '위통', jp: '胃が痛いです。' }
+                { id: 'pain', label: '위통', jp: '胃が痛いです。' },
+                // 💡 [추가 완료] 가스 참
+                { id: 'gas', label: '가스 참 / 팽만감', jp: 'お腹にガスが溜まっています。' }
             ]
         },
         { 

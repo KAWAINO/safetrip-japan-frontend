@@ -1,7 +1,14 @@
+// src/pages/Result.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { questions } from "../data/questions";
-import './Result.css'; // 💡 CSS 임포트!
+import './Result.css';
+
+// 💡 연령대 매핑 사전 (의사용으로 정중한 표현 사용)
+const ageInfoMap = {
+    'under1': { kr: '1세 (12개월) 미만', jp: '1歳（12ヶ月）未満' },
+    'over1': { kr: '1세 (12개월) 이상', jp: '1歳（12ヶ月）以上' }
+};
 
 function Result() {
     const location = useLocation();
@@ -55,8 +62,12 @@ function Result() {
 
     const handleCopy = async () => {
         if (translatedResults.length === 0) return;
+        
+        // 💡 복사할 때 연령 정보도 같이 포함되도록 수정
+        const currentAge = ageInfoMap[resultData.ageId];
+        const ageText = currentAge ? `[患者の年齢層 / 환자 연령대: ${currentAge.jp}]\n` : '';
         const textToCopy = translatedResults.map(item => `• ${item.jp} (${item.kr})`).join('\n');
-        const fullText = `[症状のまとめ / 증상 요약]\n${textToCopy}`;
+        const fullText = `${ageText}[症状のまとめ / 증상 요약]\n${textToCopy}`;
 
         try {
             await navigator.clipboard.writeText(fullText);
@@ -69,6 +80,8 @@ function Result() {
 
     if (!resultData) return null;
 
+    const currentAge = ageInfoMap[resultData.ageId];
+
     return (
         <div className="container">
             <h2 className="title">의사에게 보여주세요</h2>
@@ -78,6 +91,18 @@ function Result() {
                 <p>본 번역은 소통 보조용이며, 의학적 진단을 대체하지 않습니다.<br />
                     (この翻訳はコミュニケーション補助用であり、医学的診断に代わるものではありません。)</p>
             </div>
+
+            {/* 💡 소아과 의사가 바로 볼 수 있는 환자 연령대 알림 박스 추가! */}
+            {currentAge && (
+                <div style={{ backgroundColor: '#EFF6FF', border: '2px solid #BFDBFE', borderRadius: '12px', padding: '16px', marginBottom: '24px', textAlign: 'left', width: '100%', boxSizing: 'border-box' }}>
+                    <p style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: '800', color: '#1D4ED8', wordBreak: 'keep-all', lineHeight: '1.4' }}>
+                        患者の年齢層：<span style={{ textDecoration: 'underline' }}>{currentAge.jp}</span>
+                    </p>
+                    <p style={{ margin: 0, fontSize: '13px', color: '#3B82F6', fontWeight: '600' }}>
+                        (환자의 연령대: {currentAge.kr})
+                    </p>
+                </div>
+            )}
 
             <div className="result-card">
                 <div className="result-header">
