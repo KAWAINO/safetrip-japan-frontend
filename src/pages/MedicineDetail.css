@@ -1,0 +1,133 @@
+/* src/pages/MedicineDetail.css */
+
+.detail-container {
+    padding-bottom: 40px;
+    align-items: flex-start;
+}
+
+/* 상단 헤더 영역 */
+.detail-header {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.detail-img {
+    width: 160px;
+    height: 160px;
+    border-radius: 16px;
+    /* 💡 여기도 똑같이 적용해 줍니다! */
+    object-fit: contain;
+    background-color: #fff;
+    padding: 12px;           /* 사진이 크니까 여백도 조금 더 줍니다 */
+    
+    border: 1px solid #E5E7EB;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-sizing: border-box;
+}
+
+.detail-title-kr {
+    margin: 0 0 4px 0;
+    font-size: 24px;
+    font-weight: 900;
+    color: #111827;
+    word-break: keep-all;
+}
+
+.detail-title-jp {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #6B7280;
+}
+
+.detail-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* 경고 박스 */
+.detail-warning-box {
+    width: 100%;
+    background-color: #FEF2F2;
+    border: 2px solid #FCA5A5;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center; /* 💡 flex-start를 center로 변경해서 중앙 정렬! */
+    margin-bottom: 24px;
+    box-sizing: border-box;
+}
+
+.warning-icon {
+    font-size: 20px;
+    line-height: 1; /* 💡 이모지 자체의 불필요한 위아래 여백 제거 */
+    display: flex;
+    align-items: center;
+}
+
+.detail-warning-box p {
+    margin: 0;
+    color: #DC2626;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.3;
+    word-break: keep-all;
+    transform: translateY(1px); /* 💡 폰트 특성상 미세하게 떠보이는 걸 1px 내려서 완벽한 시각적 중앙을 맞춤 */
+}
+
+/* src/pages/MedicineGuide.css */
+
+/* 하단 정보 섹션들 */
+.detail-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.info-section {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    box-sizing: border-box;
+}
+
+.info-section h3 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: #374151;
+}
+
+.info-section p {
+    margin: 0;
+    font-size: 15px;
+    color: #4B5563;
+    line-height: 1.6;
+    word-break: keep-all;
+}
+
+/* 기획자 팁 박스 (파란색 강조) */
+.tip-section {
+    background: #EFF6FF;
+    border-color: #BFDBFE;
+}
+
+.tip-section h3 {
+    color: #1D4ED8;
+}
+
+.tip-section p {
+    color: #1E3A8A;
+    font-weight: 600;
+}

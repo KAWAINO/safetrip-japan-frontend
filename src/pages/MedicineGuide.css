@@ -1,77 +1,204 @@
 /* src/pages/MedicineGuide.css */
 
-.medicine-list {
+/* 전체 컨테이너 여백 */
+.guide-container {
+    padding-bottom: 40px;
+}
+
+/* 💡 타이틀 영역 가운데 정렬 고정! */
+.guide-title-area {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.guide-desc {
+    color: #6B7280;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* 탭 버튼 컨테이너 */
+.tab-container {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
+    width: 100%;
+    gap: 8px;
+    margin-bottom: 24px;
+    background: #F3F4F6;
+    padding: 6px;
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #6B7280;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    background: #FFFFFF;
+    color: #111827;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* 💡 로딩 스피너 및 텍스트 스타일 */
+.loading-container {
+    text-align: center;
+    padding: 50px 0;
     width: 100%;
 }
 
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #E5E7EB;
+    border-top: 4px solid #2563EB;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    color: #6B7280;
+    font-weight: 600;
+}
+
+/* 상비약 리스트 컨테이너 */
+.medicine-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+/* 개별 상비약 카드 */
 .medicine-card {
     background: #FFFFFF;
-    border-radius: 16px;
     border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     display: flex;
-    padding: 16px;
+    flex-direction: column;
     gap: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-    align-items: flex-start;
+    box-sizing: border-box;
+    cursor: pointer; /* 클릭 가능하다는 표시 */
+    transition: transform 0.2s;
 }
 
-/* 임시 이미지 박스 (추후 사진으로 교체 가능) */
-.medicine-img-placeholder {
+.medicine-card:active {
+    transform: scale(0.98);
+}
+
+/* 경고 뱃지 */
+.warning-badge {
+    background: #FEF2F2;
+    color: #DC2626;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    border: 1px solid #FCA5A5;
+    word-break: keep-all;
+    display: flex;         /* 💡 flex 추가 */
+    align-items: center;   /* 💡 수직 중앙 정렬 */
+    gap: 6px;              /* 💡 이모지와 글자 사이 간격 */
+    line-height: 1.2;
+}
+
+.medicine-header {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.medicine-img {
     width: 80px;
     height: 80px;
-    min-width: 80px;
     border-radius: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.medicine-emoji {
-    font-size: 32px;
+    /* 💡 아래 3줄이 핵심 마법입니다! */
+    object-fit: contain;     /* 사진이 잘리지 않고 박스 안에 쏙 들어감 */
+    background-color: #fff;  /* 남는 빈 공간을 하얀색으로 깔끔하게 채움 */
+    padding: 4px;            /* 박스 테두리와 사진 사이에 살짝 여백을 줘서 고급스럽게 */
+    
+    border: 1px solid #E5E7EB;
+    box-sizing: border-box;
 }
 
 .medicine-info {
     display: flex;
     flex-direction: column;
-    text-align: left;
-    width: 100%;
+    gap: 4px;
+    flex: 1;
 }
 
-.medicine-category {
-    font-size: 12px;
-    font-weight: 700;
-    color: #6B7280;
-    margin-bottom: 4px;
-}
-
-.medicine-kr-name {
-    margin: 0 0 4px 0;
-    font-size: 15px;
-    font-weight: 600;
-    color: #374151;
-}
-
-/* 점원에게 보여줄 일본어 이름 (강조) */
-.medicine-jp-name {
-    margin: 0 0 8px 0;
+.medicine-name-kr {
+    margin: 0;
     font-size: 18px;
     font-weight: 800;
     color: #111827;
-    background-color: #F3F4F6;
+    word-break: keep-all;
+}
+
+.medicine-name-jp {
+    margin: 0 0 6px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #6B7280;
+}
+
+.medicine-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tag {
+    background: #EFF6FF;
+    color: #2563EB;
+    font-size: 12px;
     padding: 4px 8px;
     border-radius: 6px;
-    display: inline-block;
-    align-self: flex-start; /* 글자 길이에 맞게 배경색 맞춤 */
+    font-weight: 700;
 }
 
 .medicine-desc {
-    margin: 0;
-    font-size: 13px;
-    color: #4B5563;
-    line-height: 1.4;
+    background: #F9FAFB;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.5;
+    font-weight: 600;
     word-break: keep-all;
+}
+
+/* 💡 상세보기 링크 텍스트 */
+.detail-link {
+    text-align: right;
+    font-size: 12px;
+    color: #2563EB;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+/* 💡 데이터가 없을 때 스타일 */
+.empty-state {
+    text-align: center;
+    padding: 40px 0;
+    color: #9CA3AF;
+    width: 100%;
 }

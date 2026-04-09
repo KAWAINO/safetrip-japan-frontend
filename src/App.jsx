@@ -8,6 +8,7 @@ import Hospitals from "./pages/Hospitals";
 import Pharmacies from './pages/Pharmacies';
 import MedicineGuide from './pages/MedicineGuide';
 import PharmacySpeed from './pages/PharmacySpeed';
+import MedicineDetail from './pages/MedicineDetail';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/hospitals" element={<Hospitals />} />
         <Route path="/pharmacies" element={<Pharmacies />} />
         <Route path="/medicine-guide" element={<MedicineGuide />} />
+        <Route path="/medicine-detail/:id" element={<MedicineDetail />} />
       </Routes>
     </BrowserRouter>
   );

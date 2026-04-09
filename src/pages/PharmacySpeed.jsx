@@ -124,12 +124,28 @@ function PharmacySpeed() {
                     </div>
                 )}
 
-                <button 
-                    className="primary-btn guide-link-btn" 
-                    onClick={() => navigate('/medicine-guide')}
-                >
-                    🎒 사진으로 찾기 (상비약 도감)
-                </button>
+{selectedCard ? (
+                    <button 
+                        className="primary-btn guide-link-btn" 
+                        onClick={() => navigate('/medicine-guide', { 
+                            state: { 
+                                userType: userType, 
+                                categoryId: selectedCard.id, 
+                                categoryName: selectedCard.kr 
+                            } 
+                        })}
+                    >
+                        🎒 [{selectedCard.kr}] 추천 상비약 보기
+                    </button>
+                ) : (
+                    <button 
+                        className="primary-btn guide-link-btn" 
+                        style={{ backgroundColor: '#D1D5DB', color: '#6B7280', cursor: 'not-allowed' }}
+                        disabled
+                    >
+                        🎒 찾으시는 약을 먼저 선택해주세요
+                    </button>
+                )}
             </div>
         </>
     );

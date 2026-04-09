@@ -56,55 +56,69 @@ export const pharmacyData = {
 
     adult: [
         { 
-            id: 'fever', icon: '🌡️', kr: '해열 / 진통제', jp: '解熱鎮痛剤はどこですか？', displayJp: '解熱鎮痛剤をください。',
+            id: 'fever', icon: '💊', kr: '해열 / 진통제', jp: '解熱鎮痛剤(げねつじんつうざい)はどこですか？', displayJp: '解熱鎮痛剤をください。',
             subSymptoms: [
-                { id: 'head', label: '두통', jp: '頭痛がします。' },
-                { id: 'period', label: '생리통', jp: '生理痛です。' },
-                { id: 'tooth', label: '치통', jp: '歯が痛いです。' }
+                { id: 'head', label: '머리가 아파요', jp: '頭痛があります。' },
+                { id: 'throat', label: '목이 아파요', jp: '喉の痛みがあります。' },
+                { id: 'tooth', label: '치통/생리통', jp: '歯痛・生理痛です。' }
             ]
         },
         { 
-            id: 'cold', icon: '🤧', kr: '감기약', jp: '風邪薬をください。', displayJp: '大人の風邪薬をください。',
+            id: 'cold', icon: '🤧', kr: '감기약', jp: '風邪薬(かぜぐすり)はどこですか？', displayJp: '風邪薬をください。',
             subSymptoms: [
                 { id: 'throat', label: '목감기 (인후통)', jp: '喉の痛みがひどいです。' },
                 { id: 'nose', label: '코감기 (콧물/코막힘)', jp: '鼻水・鼻づまりがあります。' },
                 { id: 'cough', label: '기침 / 가래', jp: '咳・たんが出ます。' },
-                { id: 'fever', label: '열 동반', jp: '熱もあります。' },
-                // 💡 [추가 완료] 몸살 기운
-                { id: 'chill', label: '오한 / 몸살', jp: '寒気や体の痛みがあります。' }
+                { id: 'fever', label: '열 동반', jp: '熱もあります。' }
             ]
         },
+        // 💡 새로 추가된 비염 카테고리!
         { 
-            id: 'stomach', icon: '🤢', kr: '소화제 / 위장약', displayJp: '胃腸薬をください。',
+            id: 'nose', icon: '👃', kr: '비염 / 알레르기', jp: '鼻炎薬(びえんやく)はどこですか？', displayJp: '鼻炎・アレルギーの薬をください。',
             subSymptoms: [
-                { id: 'indigestion', label: '소화불량/체함', jp: '胃もたれ・消化不良です。' },
-                { id: 'heartburn', label: '속쓰림', jp: '胸やけがします。' },
-                { id: 'pain', label: '위통', jp: '胃が痛いです。' },
-                // 💡 [추가 완료] 가스 참
-                { id: 'gas', label: '가스 참 / 팽만감', jp: 'お腹にガスが溜まっています。' }
+                { id: 'stuffy', label: '코막힘', jp: '鼻がひどく詰まっています。' },
+                { id: 'runny', label: '콧물', jp: '水っぽい鼻水が止まりません。' },
+                { id: 'sneeze', label: '재채기', jp: 'くしゃみがひどいです。' }
+            ]
+        },
+        // 💡 새로 추가된 안약 카테고리!
+        { 
+            id: 'eye', icon: '👁️', kr: '안약 / 인공눈물', jp: '目薬(めぐすり)はどこですか？', displayJp: '目薬をください。',
+            subSymptoms: [
+                { id: 'tired', label: '피로', jp: '目が疲れています。' },
+                { id: 'dry', label: '건조(인공눈물)', jp: '目が乾燥しています（人工涙液）。' },
+                { id: 'itch', label: '가려움 / 충혈', jp: '目がかゆいです・充血しています。' }
             ]
         },
         { 
-            id: 'pain', icon: '⚡', kr: '파스 / 근육통', displayJp: '湿布（筋肉痛・関節痛）はどこですか？',
+            id: 'stomach', icon: '🤢', kr: '소화제 / 위장약', jp: '胃腸薬(いちょうやく)はどこですか？', displayJp: '胃腸薬をください。',
+            subSymptoms: [
+                { id: 'digest', label: '소화불량/체함', jp: '消化不良で胃がもたれています。' },
+                { id: 'heartburn', label: '속쓰림/위산역류', jp: '胸やけがします・胃酸が逆流します。' },
+                { id: 'diarrhea', label: '설사/장염', jp: '下痢をしています。' }
+            ]
+        },
+        { 
+            id: 'pain', icon: '⚡', kr: '근육통 / 파스', jp: '湿布(しっぷ)はどこですか？', displayJp: '湿布や筋肉痛の薬をください。',
             subSymptoms: [
                 { id: 'shoulder', label: '어깨 결림', jp: '肩こりがひどいです。' },
-                { id: 'back', label: '허리 통증', jp: '腰が痛いです。' },
-                { id: 'joint', label: '관절통', jp: '関節が痛いです。' }
+                { id: 'back', label: '허리 통증', jp: '腰痛があります。' },
+                { id: 'joint', label: '관절/무릎 통증', jp: '関節・膝が痛いです。' }
             ]
         },
         { 
-            id: 'hangover', icon: '🍻', kr: '숙취 해소제', displayJp: '二日酔いに効く薬をください。',
+            id: 'hangover', icon: '🍻', kr: '숙취 해소', jp: '二日酔い(ふつかよい)の薬はどこですか？', displayJp: '二日酔いに効く薬をください。',
             subSymptoms: [
-                { id: 'nausea', label: '메스꺼움/구토', jp: '吐き気がします。' },
-                { id: 'headache', label: '두통', jp: '頭痛がします。' },
-                { id: 'fatigue', label: '피로감', jp: 'だるいです。' }
+                { id: 'before', label: '술 마시기 전', jp: 'お酒を飲む前に飲む薬をください。' },
+                { id: 'after', label: '술 마신 후 (두통/메스꺼움)', jp: 'お酒を飲んだ後で、頭痛と吐き気があります。' }
             ]
         },
         { 
-            id: 'bug', icon: '🦟', kr: '벌레 / 피부약', displayJp: '虫刺されやかゆみ止めの薬をください。',
+            id: 'bug', icon: '🦟', kr: '벌레 / 피부약', jp: '虫刺されの薬はどこですか？', displayJp: '虫刺され・皮膚の薬をください。',
             subSymptoms: [
-                { id: 'itch', label: '가려움', jp: 'かゆみがひどいです。' },
-                { id: 'red', label: '붉어짐', jp: '赤く腫れています。' }
+                { id: 'bug', label: '모기/벌레 물림', jp: '蚊や虫に刺されました。' },
+                { id: 'itch', label: '심한 가려움/두드러기', jp: '強いかゆみ・蕁麻疹があります。' },
+                { id: 'wound', label: '상처/화상 연고', jp: '傷・やけど用の軟膏をください。' }
             ]
         }
     ]
