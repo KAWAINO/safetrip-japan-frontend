@@ -146,9 +146,9 @@ function MedicineGuide() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="medicine-desc">
+                                    {/* <div className="medicine-desc">
                                         💡 {medicine.desc}
-                                    </div>
+                                    </div> */}
                                     
                                     <div className="detail-link">
                                         자세히 보기 ➡️
