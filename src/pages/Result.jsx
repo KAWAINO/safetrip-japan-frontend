@@ -74,7 +74,7 @@ function Result() {
             setIsCopied(true);
             setTimeout(() => setIsCopied(false), 2000);
         } catch (err) {
-            alert("복사 기능을 지원하지 않는 브라우저입니다.");
+            alert("복사 기능을 지원하지 않는 브라우저입니다.", err);
         }
     };
 
@@ -83,8 +83,9 @@ function Result() {
     const currentAge = ageInfoMap[resultData.ageId];
 
     return (
+        
         <div className="container">
-            <h2 className="title">의사에게 보여주세요</h2>
+            <h2 className="title">직원 또는 의사에게 보여주세요</h2>
 
             <div className="disclaimer-box">
                 <span className="alert-icon">⚠️</span>
