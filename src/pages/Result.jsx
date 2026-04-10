@@ -87,6 +87,17 @@ function Result() {
         <div className="container">
             <h2 className="title">직원 또는 의사에게 보여주세요</h2>
 
+            {/* 💡 SOS 아이스브레이킹 메시지 박스 */}
+            <div className="sos-message-box">
+                <p className="sos-jp-text">
+                    日本を旅行中の韓国人です。日本語はよく話せません。<br />
+                    年齢と症状は以下の通りです。診察が必要です。
+                </p>
+                <p className="sos-kr-text">
+                    (일본을 여행 중인 한국인 입니다. 일본어를 잘 모릅니다. 연령과 증상은 아래와 같습니다. 진찰이 필요합니다.)
+                </p>
+            </div>
+
             <div className="disclaimer-box">
                 <span className="alert-icon">⚠️</span>
                 <p>본 번역은 소통 보조용이며, 의학적 진단을 대체하지 않습니다.<br />

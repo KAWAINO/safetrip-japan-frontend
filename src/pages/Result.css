@@ -92,3 +92,32 @@
     text-align: center;
     margin-top: 20px;
 }
+
+/* SOS 아이스브레이킹 메시지 박스 */
+.sos-message-box {
+    background-color: #FFFBEB; /* 부드러운 노란색 배경 */
+    border: 2px solid #FCD34D;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+/* SOS 일본어 텍스트 (직원용 메인) */
+.sos-jp-text {
+    font-size: 16px;
+    font-weight: bold;
+    color: #B45309;
+    margin: 0 0 10px 0;
+    line-height: 1.5;
+    word-break: keep-all;
+}
+
+/* SOS 한국어 텍스트 (부모님 확인용 서브) */
+.sos-kr-text {
+    font-size: 12px;
+    color: #D97706;
+    margin: 0;
+    line-height: 1.4;
+    word-break: keep-all;
+}
