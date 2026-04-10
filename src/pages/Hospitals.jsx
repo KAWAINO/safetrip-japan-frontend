@@ -147,7 +147,8 @@ const openDirections = (hospital) => {
     // destination_place_id를 포함하여 엉뚱한 사무실이 아닌 '정확한 병원'이 찍히게 합니다.
     const url = `https://www.google.com/maps/dir/?api=1&destination=${encodedName}&destination_place_id=${hospital.id}`;
     
-    window.open(url, "_blank");
+    // window.open(url, "_blank");
+    window.open(url, "_self");
 };
 
     // 💡 [최종 수정] 줌 레벨과 위치를 강제로 고정하는 경로 기반 URL
@@ -157,7 +158,8 @@ const openDirections = (hospital) => {
         const query = encodeURIComponent("小児科");
         const url = `https://www.google.com/maps/search/${query}/@${MY_LOCATION.lat},${MY_LOCATION.lng},14z`;
         
-        window.open(url, "_blank");
+        // window.open(url, "_blank");
+        window.open(url, "_self");
     };
 
     return (
@@ -195,11 +197,11 @@ const openDirections = (hospital) => {
                             <p className="hospital-address">📍 {hospital.addressKr}</p>
 
                             {/* 💡 언어 지원 여부는 API에서 알 수 없으므로 번역앱 안내 문구로 대체했습니다 */}
-                            <div className="hospital-langs">
+                            {/* <div className="hospital-langs">
                                 <span className="hospital-lang-badge" style={{ backgroundColor: '#FEF3C7', color: '#D97706' }}>
                                     💡 방문 전 파파고 등 번역앱을 준비하세요
                                 </span>
-                            </div>
+                            </div> */}
 
                             <button onClick={() => openDirections(hospital)} className="map-btn">
                                 🗺️ 이 병원으로 길찾기
