@@ -148,9 +148,9 @@ function Result() {
                 <button className="primary-btn location-btn" style={{ backgroundColor: '#10B981', marginBottom: '12px' }} onClick={() => navigate('/pharmacies')}>
                     💊 근처 약국 / 드럭스토어 찾기
                 </button>
-                <button className="primary-btn" style={{ backgroundColor: '#F59E0B', color: 'white', marginBottom: '12px' }} onClick={() => navigate('/medicine-guide')}>
+                {/* <button className="primary-btn" style={{ backgroundColor: '#F59E0B', color: 'white', marginBottom: '12px' }} onClick={() => navigate('/medicine-guide')}>
                     🎒 일본 어린이 상비약 도감 보기
-                </button>
+                </button> */}
                 <button className="primary-btn" style={{ backgroundColor: "#E5E7EB", color: "#4B5563" }} onClick={handleGoHome}>
                     🏠 처음으로 돌아가기
                 </button>

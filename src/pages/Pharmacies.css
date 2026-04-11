@@ -1,50 +1,157 @@
 /* src/pages/Pharmacies.css */
 
-/* 기획자님의 주/야간 알림 박스 스타일 */
-.night-alert {
-    background-color: #FEF3C7; 
-    border-color: #F59E0B;
-    margin-bottom: 20px;
+/* --- 탭 버튼 스타일 --- */
+.tab-container {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+  margin-bottom: 20px;
 }
-.night-alert p { color: #B45309; margin: 0; line-height: 1.5; font-size: 14px;}
 
-.day-alert {
-    background-color: #EFF6FF; 
-    border-color: #3B82F6;
-    margin-bottom: 20px;
+.tab-btn {
+  flex: 1;
+  padding: 12px 5px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: #e5e7eb; /* 기본 비활성 배경 */
+  color: #6b7280; /* 기본 비활성 텍스트 */
 }
-.day-alert p { color: #1D4ED8; margin: 0; line-height: 1.5; font-size: 14px;}
 
+/* 💡 핵심: 붙여서 써서 우선순위를 높임 (Chaining) */
+.tab-btn.active-drugstore {
+  background-color: #10b981 !important;
+  color: white !important;
+}
+
+.tab-btn.active-pharmacy {
+  background-color: #3b82f6 !important;
+  color: white !important;
+}
+
+/* --- 알림 박스 조건부 스타일 --- */
+/* (Hospitals.css 등에서 day-alert, night-alert 기본 속성이 있을 수 있으니 덮어씌우기) */
+.disclaimer-box.alert-drugstore {
+  background-color: #ecfdf5;
+  border-color: #10b981;
+}
+.disclaimer-box.alert-drugstore p {
+  color: #047857;
+}
+
+.disclaimer-box.alert-pharmacy {
+  background-color: #eff6ff;
+  border-color: #3b82f6;
+}
+.disclaimer-box.alert-pharmacy p {
+  color: #1d4ed8;
+}
+
+.sub-desc {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* --- 리스트 공통 및 조건부 스타일 --- */
 .pharmacy-list-wrap {
-    display: flex; 
-    flex-direction: column; 
-    gap: 16px; 
-    width: 100%; 
-    margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  margin-top: 10px;
 }
 
-/* 아래는 소아과 화면과 동일한 카드 레이아웃 유지용 */
+.loading-text {
+  width: 100%;
+  text-align: center;
+  padding: 40px 0;
+  color: #6b7280;
+}
+
 .hospital-card {
-    background: white; padding: 20px; border-radius: 16px; border: 1px solid #E5E7EB; 
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
+
 .hospital-header-row {
-    display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
 }
-.hospital-name-kr { margin: 0 0 4px 0; font-size: 18px; color: #111827; }
+
+.hospital-name-kr {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  color: #111827;
+  word-break: keep-all;
+}
+
 .hospital-distance {
-    padding: 4px 8px; border-radius: 8px; font-size: 14px; font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
 }
+
 .hospital-address {
-    margin: 0 0 12px 0; font-size: 13px; color: #6B7280;
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  color: #6b7280;
 }
-.hospital-langs {
-    display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+
+/* 거리 뱃지 색상 강제 지정 */
+.dist-drugstore {
+  background-color: #ecfdf5 !important;
+  color: #059669 !important;
 }
-.hospital-lang-badge {
-    padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;
+.dist-pharmacy {
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
 }
+
+/* 길찾기 버튼 */
 .map-btn {
-    width: 100%; padding: 12px; color: white; border: none; 
-    border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer;
+  width: 100%;
+  padding: 12px;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.map-btn.btn-drugstore {
+  background-color: #10b981;
+}
+.map-btn.btn-pharmacy {
+  background-color: #3b82f6;
+}
+
+/* 전체 지도 보기 버튼 */
+.full-map-btn {
+  width: 100%;
+  padding: 16px;
+  margin-top: 8px;
+  margin-bottom: 40px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  color: white;
+}
+
+.full-map-btn.btn-drugstore {
+  background-color: #059669;
+}
+.full-map-btn.btn-pharmacy-dark {
+  background-color: #2563eb;
 }

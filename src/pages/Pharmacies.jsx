@@ -25,10 +25,9 @@ function Pharmacies() {
     const [pharmacies, setPharmacies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isNight, setIsNight] = useState(false);
-    
-    // 💡 핵심: 현재 선택된 탭 상태 (기본값은 수요가 가장 많은 '드럭스토어')
     const [searchType, setSearchType] = useState('drugstore'); 
 
+    // 💡 테스트용 고정 위치 (나고야역)
     const MY_LOCATION = { lat: 35.1709, lng: 136.8815 };
 
     useEffect(() => {
@@ -37,17 +36,34 @@ function Pharmacies() {
         setIsNight(nightMode);
 
         const fetchPharmacies = async () => {
-            setLoading(true); // 탭을 바꿀 때마다 로딩 표시
+            setLoading(true);
             try {
+                // ----------------------------------------------------
+                // 🚨 실전 배포 시 아래 주석을 풀고 GPS 위치를 사용해!
+                // ----------------------------------------------------
+                /*
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const currentPos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    // ... (아래 API 호출 로직이 이 안으로 들어와야 함) ...
+                }, (error) => {
+                    console.error("위치 정보 에러:", error);
+                    // 위치 허용 거부 시 기본 위치(MY_LOCATION) 사용 로직 등 추가 필요
+                });
+                */
+                // ----------------------------------------------------
+
+                // 지금은 테스트를 위해 고정 위치 사용
                 const currentPos = MY_LOCATION;
                 const placesService = await loadGooglePlacesService();
 
-                // 💡 탭에 따라 검색 키워드 완벽 분리
-                const keywordTarget = searchType === 'drugstore' ? 'ドラッグストア' : '薬局';
+                const keywordTarget = searchType === 'drugstore' ? '薬局' : '調剤薬局';
 
                 const request = {
                     location: currentPos,
-                    radius: searchType === 'drugstore' ? 2000 : 3000, // 드럭스토어는 2km, 약국은 조금 더 넓게 3km
+                    radius: searchType === 'drugstore' ? 2000 : 3000, 
                     keyword: keywordTarget, 
                     openNow: nightMode 
                 };
@@ -72,7 +88,7 @@ function Pharmacies() {
                         formattedData.sort((a, b) => a.distance - b.distance);
                         setPharmacies(formattedData.slice(0, 5)); 
                     } else {
-                        setPharmacies([]); // 결과가 없을 때 리스트 비우기
+                        setPharmacies([]); 
                     }
                     setLoading(false);
                 });
@@ -84,7 +100,7 @@ function Pharmacies() {
         };
 
         fetchPharmacies();
-    }, [searchType]); // 💡 searchType이 바뀔 때마다 useEffect 다시 실행!
+    }, [searchType]); 
 
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
         const R = 6371; 
@@ -98,13 +114,13 @@ function Pharmacies() {
     const openDirections = (pharmacy) => {
         const encodedName = encodeURIComponent(pharmacy.nameKr);
         const url = `https://www.google.com/maps/dir/?api=1&destination=${encodedName}&destination_place_id=${pharmacy.id}`;
-        window.open(url, "_self");
+        window.open(url, "_self"); // 모바일 유령 탭 방지 (_self 역할)
     };
 
     const openFullMap = () => {
-        const query = encodeURIComponent(searchType === 'drugstore' ? 'ドラッグストア' : '薬局');
+        const query = encodeURIComponent(searchType === 'drugstore' ? '薬局' : '調剤薬局');
         const url = `https://www.google.com/maps/search/${query}/@${MY_LOCATION.lat},${MY_LOCATION.lng},15z`;
-        window.open(url, "_self");
+        window.open(url, "_self"); 
     };
 
     return (
@@ -112,80 +128,71 @@ function Pharmacies() {
             <Header onBack={() => navigate(-1)} />
             
             <div className="container" style={{ alignItems: "flex-start" }}>
-                <h2 className="title" style={{ marginBottom: "16px" }}>어떤 약이 필요하신가요?</h2>
+                <h2 className="title" style={{ marginBottom: "16px" }}>어떤 곳을 찾으시나요?</h2>
 
-                {/* 💡 목적별 탭 UI 추가 */}
-                <div style={{ display: 'flex', width: '100%', gap: '10px', marginBottom: '20px' }}>
+                {/* 💡 탭 버튼 UI (CSS 클래스로 분리) */}
+                <div className="tab-container">
                     <button 
                         onClick={() => setSearchType('drugstore')}
-                        style={{ 
-                            flex: 1, padding: '12px 5px', borderRadius: '10px', fontWeight: 'bold', fontSize: '14px', border: 'none', cursor: 'pointer', transition: '0.2s',
-                            backgroundColor: searchType === 'drugstore' ? '#10B981' : '#E5E7EB',
-                            color: searchType === 'drugstore' ? 'white' : '#6B7280'
-                        }}
+                        className={`tab-btn ${searchType === 'drugstore' ? 'active-drugstore' : ''}`}
                     >
-                        💊 상비약 (드럭스토어)
+                        💊 약국 (드럭스토어)
                     </button>
                     <button 
                         onClick={() => setSearchType('pharmacy')}
-                        style={{ 
-                            flex: 1, padding: '12px 5px', borderRadius: '10px', fontWeight: 'bold', fontSize: '14px', border: 'none', cursor: 'pointer', transition: '0.2s',
-                            backgroundColor: searchType === 'pharmacy' ? '#3B82F6' : '#E5E7EB',
-                            color: searchType === 'pharmacy' ? 'white' : '#6B7280'
-                        }}
+                        className={`tab-btn ${searchType === 'pharmacy' ? 'active-pharmacy' : ''}`}
                     >
-                        🏥 처방약 (조제약국)
+                        🏥 조제 약국
                     </button>
                 </div>
                 
-                {/* 💡 탭에 따른 맞춤형 안내 문구 */}
+                {/* 💡 안내 문구 (CSS 클래스 활용) */}
                 {searchType === 'drugstore' ? (
-                    <div className="disclaimer-box day-alert" style={{ backgroundColor: '#ECFDF5', borderColor: '#10B981' }}>
+                    <div className="disclaimer-box day-alert alert-drugstore">
                         <span className="alert-icon">💊</span>
-                        <p style={{ color: '#047857' }}>
-                            호빵맨 시럽, 해열패치 등 <b>일반 상비약</b>을 구매할 수 있습니다. <br/>
-                            {isNight && "🌙 현재 영업 중인 곳만 표시됩니다. 등록판매자 부재 시 일부 약은 못 살 수 있습니다."}
+                        <p>
+                            <b>일반 상비약</b>을 구매할 수 있습니다.<br/>
+                            {isNight && "🌙 현재 영업 중인 곳만 표시됩니다. 약사 부재 시 일부 약(1류 의약품)은 구매가 불가할 수 있습니다."}
                         </p>
                     </div>
                 ) : (
-                    <div className="disclaimer-box day-alert" style={{ backgroundColor: '#EFF6FF', borderColor: '#3B82F6' }}>
+                    <div className="disclaimer-box day-alert alert-pharmacy">
                         <span className="alert-icon">🏥</span>
-                        <p style={{ color: '#1D4ED8' }}>
-                            병원에서 받은 <b>처방전</b>이 있어야 약을 지을 수 있는 곳입니다. <br/>
-                            {isNight && "🌙 심야에는 문을 연 조제약국이 거의 없을 수 있습니다."}
+                        <p>
+                            병원 <b>처방전</b>이 있어야 약을 지을 수 있습니다.<br/>
+                            <span className="sub-desc">
+                                (일부 상비약/생활용품을 파는 곳도 있으나, 처방약 조제가 메인입니다.)
+                            </span><br/>
+                            {isNight && "🌙 심야에는 영업 중인 조제약국이 거의 없을 수 있습니다."}
                         </p>
                     </div>
                 )}
 
                 {loading ? (
-                    <p style={{ width: '100%', textAlign: 'center', padding: '40px 0', color: '#6B7280' }}>
-                        {searchType === 'drugstore' ? '주변 드럭스토어를' : '주변 조제약국을'} 찾고 있습니다... 🔍
+                    <p className="loading-text">
+                        {searchType === 'drugstore' ? '주변 약국을' : '주변 조제약국을'} 찾고 있습니다... 🔍
                     </p>
                 ) : pharmacies.length === 0 ? (
-                    <p style={{ width: '100%', textAlign: 'center', padding: '40px 0', color: '#6B7280' }}>
-                        주변에 영업 중인 곳이 없습니다.
-                    </p>
+                    <p className="loading-text">주변에 영업 중인 곳이 없습니다.</p>
                 ) : (
                     <div className="pharmacy-list-wrap">
                         {pharmacies.map(pharmacy => (
                             <div key={pharmacy.id} className="hospital-card">
                                 <div className="hospital-header-row">
                                     <div>
-                                        <h3 className="hospital-name-kr" style={{ wordBreak: 'keep-all' }}>{pharmacy.nameKr}</h3>
+                                        <h3 className="hospital-name-kr">{pharmacy.nameKr}</h3>
                                     </div>
-                                    <span className="hospital-distance" style={{ 
-                                        backgroundColor: searchType === 'drugstore' ? '#ECFDF5' : '#EFF6FF', 
-                                        color: searchType === 'drugstore' ? '#059669' : '#1D4ED8' 
-                                    }}>
+                                    <span className={`hospital-distance ${searchType === 'drugstore' ? 'dist-drugstore' : 'dist-pharmacy'}`}>
                                         {pharmacy.distance.toFixed(1)}km
                                     </span>
                                 </div>
 
                                 <p className="hospital-address">📍 {pharmacy.addressKr}</p>
 
-                                <button onClick={() => openDirections(pharmacy)} className="map-btn" style={{ 
-                                    backgroundColor: searchType === 'drugstore' ? '#10B981' : '#3B82F6' 
-                                }}>
+                                <button 
+                                    onClick={() => openDirections(pharmacy)} 
+                                    className={`map-btn ${searchType === 'drugstore' ? 'btn-drugstore' : 'btn-pharmacy'}`}
+                                >
                                     🗺️ 길찾기 시작
                                 </button>
                             </div>
@@ -193,13 +200,7 @@ function Pharmacies() {
 
                         <button 
                             onClick={openFullMap} 
-                            style={{ 
-                                width: '100%', padding: '16px', marginTop: '8px', marginBottom: '40px',
-                                backgroundColor: searchType === 'drugstore' ? '#059669' : '#2563EB', 
-                                color: 'white', border: 'none', 
-                                borderRadius: '12px', fontSize: '16px', fontWeight: 'bold', 
-                                cursor: 'pointer' 
-                            }}
+                            className={`full-map-btn ${searchType === 'drugstore' ? 'btn-drugstore' : 'btn-pharmacy-dark'}`}
                         >
                             📍 구글 맵에서 전체 보기
                         </button>
