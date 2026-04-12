@@ -10,7 +10,7 @@ function Home() {
     // 💡 단계: start(시작) -> child_age(나이 선택) -> child_dest(목적지 선택)
     const [step, setStep] = useState('start');
     
-    // 💡 선택한 아이의 연령 정보 저장 (PharmacySpeed로 넘겨주기 위함)
+    // 💡 선택한 아이의 연령 정보 저장
     const [childAgeLabel, setChildAgeLabel] = useState('');
     const [childAgeId, setChildAgeId] = useState('');
 
@@ -19,25 +19,22 @@ function Home() {
         else if (step === 'child_dest') setStep('child_age');
     };
 
-    // 연령 선택 시 실행되는 함수
     const handleAgeSelect = (id, label) => {
         setChildAgeId(id);
         setChildAgeLabel(label);
-        setStep('child_dest'); // 목적지 선택 화면으로 이동
+        setStep('child_dest'); 
     };
 
-    // 병원 이동 (기존 질문 데이터가 under1, over1 2가지이므로 매핑 처리)
     const handleHospitalClick = () => {
         const questionPath = childAgeId === 'under1' ? 'under1' : 'over1';
         navigate(`/question/${questionPath}`);
     };
 
-    // 약국 이동 (선택한 연령 정보 택배로 같이 보내기!)
     const handlePharmacyClick = () => {
         navigate('/pharmacy-speed', { 
             state: { 
                 type: 'child', 
-                ageLabel: childAgeLabel // "1세 미만", "2세 이상" 등의 텍스트
+                ageLabel: childAgeLabel 
             } 
         });
     };
@@ -71,10 +68,37 @@ function Home() {
                         <button className="target-btn" onClick={() => setStep('child_age')}>
                             <span className="emoji-icon">👶</span> 소아 (어린이)
                         </button>
+
+                        {/* 💡 신규 추가: 번역 없이 바로 지도/위치를 보고 싶은 유저를 위한 빠른 찾기 */}
+                        <div style={{ marginTop: '32px', width: '100%' }}>
+                            <h3 style={{ fontSize: '15px', color: '#6B7280', marginBottom: '12px', textAlign: 'center' }}>
+                                📍 번역 없이 내 주변 시설 바로 찾기
+                            </h3>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <button 
+                                    onClick={() => navigate('/hospitals')}
+                                    style={{ 
+                                        flex: 1, padding: '14px 10px', borderRadius: '12px', 
+                                        backgroundColor: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE', 
+                                        fontWeight: 'bold', fontSize: '14px', cursor: 'pointer' 
+                                    }}>
+                                    🏥 근처 소아과
+                                </button>
+                                <button 
+                                    onClick={() => navigate('/pharmacies')}
+                                    style={{ 
+                                        flex: 1, padding: '14px 10px', borderRadius: '12px', 
+                                        backgroundColor: '#ECFDF5', color: '#059669', border: '1px solid #A7F3D0', 
+                                        fontWeight: 'bold', fontSize: '14px', cursor: 'pointer' 
+                                    }}>
+                                    💊 근처 약국
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 )}
 
-                {/* 💡 2단계: 소아 전용 - 연령 우선 선택 */}
+                {/* 2단계: 소아 전용 - 연령 우선 선택 */}
                 {step === 'child_age' && (
                     <div className="step-wrapper">
                         <div className="title-area">
@@ -94,14 +118,13 @@ function Home() {
                     </div>
                 )}
 
-                {/* 💡 3단계: 소아 전용 - 목적지 선택 */}
+                {/* 3단계: 소아 전용 - 목적지 선택 */}
                 {step === 'child_dest' && (
                     <div className="step-wrapper">
                         <div className="title-area">
                             <h1>어디로 가시나요?</h1>
                         </div>
 
-                        {/* 24개월 미만일 경우 띄워주는 안전 경고문! */}
                         {(childAgeId === 'under1' || childAgeId === '1to2') && (
                             <div className="disclaimer-box" style={{ marginBottom: '10px', padding: '12px' }}>
                                 <span className="alert-icon">⚠️</span>

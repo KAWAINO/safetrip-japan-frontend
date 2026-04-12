@@ -27,52 +27,71 @@ function Pharmacies() {
     const [isNight, setIsNight] = useState(false);
     const [searchType, setSearchType] = useState('drugstore'); 
 
+    // 💡 추가됨: 사용자 실제 위치 상태 및 에러 상태
+    const [userLocation, setUserLocation] = useState(null);
+    const [locationError, setLocationError] = useState(false);
+
     // 💡 테스트용 고정 위치 (나고야역)
     const MY_LOCATION = { lat: 35.1709, lng: 136.8815 };
 
+    // 1️⃣ 컴포넌트 마운트 시 위치 가져오기 및 주/야간 모드 설정
     useEffect(() => {
         const currentHour = new Date().getHours();
         const nightMode = currentHour >= 20 || currentHour < 9;
         setIsNight(nightMode);
 
+        // ------------------------------------------------------------------
+        // 🚨 [테스트 모드] 한국에서 일본 검색을 테스트하고 싶다면 아래 두 줄의 주석을 푸세요!
+        // ------------------------------------------------------------------
+        // setUserLocation(MY_LOCATION);
+        // return; 
+        // ------------------------------------------------------------------
+
+        // ✅ [실전 모드] 실제 스마트폰 GPS 로직
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setUserLocation({
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    });
+                },
+                (error) => {
+                    console.error("GPS 권한 에러:", error);
+                    setLocationError(true);
+                    setLoading(false);
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        } else {
+            setLocationError(true);
+            setLoading(false);
+        }
+    }, []);
+
+    // 2️⃣ 위치(userLocation)가 파악되면 약국 검색 API 실행하기
+    useEffect(() => {
+        if (!userLocation) return;
+
         const fetchPharmacies = async () => {
             setLoading(true);
             try {
-                // ----------------------------------------------------
-                // 🚨 실전 배포 시 아래 주석을 풀고 GPS 위치를 사용해!
-                // ----------------------------------------------------
-                /*
-                navigator.geolocation.getCurrentPosition(async (position) => {
-                    const currentPos = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                    // ... (아래 API 호출 로직이 이 안으로 들어와야 함) ...
-                }, (error) => {
-                    console.error("위치 정보 에러:", error);
-                    // 위치 허용 거부 시 기본 위치(MY_LOCATION) 사용 로직 등 추가 필요
-                });
-                */
-                // ----------------------------------------------------
-
-                // 지금은 테스트를 위해 고정 위치 사용
-                const currentPos = MY_LOCATION;
                 const placesService = await loadGooglePlacesService();
 
                 const keywordTarget = searchType === 'drugstore' ? '薬局' : '調剤薬局';
 
                 const request = {
-                    location: currentPos,
+                    location: userLocation, // 💡 내 위치 적용
                     radius: searchType === 'drugstore' ? 2000 : 3000, 
                     keyword: keywordTarget, 
-                    openNow: nightMode 
+                    openNow: isNight // 야간일 때만 강제로 '현재 영업 중' 필터 적용
                 };
 
                 placesService.nearbySearch(request, (results, status) => {
                     if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
                         const formattedData = results.map(place => {
                             const distance = calculateDistance(
-                                currentPos.lat, currentPos.lng, 
+                                userLocation.lat, userLocation.lng, // 💡 내 위치 적용
                                 place.geometry.location.lat(), place.geometry.location.lng()
                             );
                             return {
@@ -100,7 +119,7 @@ function Pharmacies() {
         };
 
         fetchPharmacies();
-    }, [searchType]); 
+    }, [userLocation, searchType, isNight]); // 💡 위치, 탭, 주야간 상태가 바뀔 때마다 실행
 
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
         const R = 6371; 
@@ -114,13 +133,14 @@ function Pharmacies() {
     const openDirections = (pharmacy) => {
         const encodedName = encodeURIComponent(pharmacy.nameKr);
         const url = `https://www.google.com/maps/dir/?api=1&destination=${encodedName}&destination_place_id=${pharmacy.id}`;
-        window.open(url, "_self"); // 모바일 유령 탭 방지 (_self 역할)
+        window.location.href = url; 
     };
 
     const openFullMap = () => {
+        if (!userLocation) return;
         const query = encodeURIComponent(searchType === 'drugstore' ? '薬局' : '調剤薬局');
-        const url = `https://www.google.com/maps/search/${query}/@${MY_LOCATION.lat},${MY_LOCATION.lng},15z`;
-        window.open(url, "_self"); 
+        const url = `https://www.google.com/maps/search/${query}/@${userLocation.lat},${userLocation.lng},15z`;
+        window.location.href = url; 
     };
 
     return (
@@ -130,7 +150,7 @@ function Pharmacies() {
             <div className="container" style={{ alignItems: "flex-start" }}>
                 <h2 className="title" style={{ marginBottom: "16px" }}>어떤 곳을 찾으시나요?</h2>
 
-                {/* 💡 탭 버튼 UI (CSS 클래스로 분리) */}
+                {/* 💡 탭 버튼 UI */}
                 <div className="tab-container">
                     <button 
                         onClick={() => setSearchType('drugstore')}
@@ -146,7 +166,7 @@ function Pharmacies() {
                     </button>
                 </div>
                 
-                {/* 💡 안내 문구 (CSS 클래스 활용) */}
+                {/* 💡 안내 문구 */}
                 {searchType === 'drugstore' ? (
                     <div className="disclaimer-box day-alert alert-drugstore">
                         <span className="alert-icon">💊</span>
@@ -168,9 +188,24 @@ function Pharmacies() {
                     </div>
                 )}
 
-                {loading ? (
+                {/* 💡 위치 권한 거부 시 안내 메시지 */}
+                {locationError ? (
+                    <div style={{ width: '100%', textAlign: 'center', padding: '40px 0' }}>
+                        <span className="alert-icon" style={{fontSize: '30px', display: 'block', margin: '0 auto 10px'}}>📍</span>
+                        <p style={{color: '#111827', fontWeight: 'bold', marginBottom: '8px'}}>위치 정보를 가져올 수 없습니다.</p>
+                        <p style={{fontSize: '14px', color: '#6B7280'}}>
+                            내 주변 약국을 찾으려면 스마트폰 설정에서<br/>웹사이트의 <b>[위치(GPS) 권한]</b>을 허용해 주세요.
+                        </p>
+                        <button 
+                            onClick={() => window.location.reload()} 
+                            style={{marginTop: '16px', padding: '10px 20px', borderRadius: '8px', border: 'none', backgroundColor: '#3B82F6', color: 'white', fontWeight: 'bold'}}
+                        >
+                            새로고침
+                        </button>
+                    </div>
+                ) : loading || !userLocation ? ( 
                     <p className="loading-text">
-                        {searchType === 'drugstore' ? '주변 약국을' : '주변 조제약국을'} 찾고 있습니다... 🔍
+                        {!userLocation ? '현재 위치를 확인하고 있습니다... 📍' : (searchType === 'drugstore' ? '주변 약국을 찾고 있습니다... 🔍' : '주변 조제약국을 찾고 있습니다... 🔍')}
                     </p>
                 ) : pharmacies.length === 0 ? (
                     <p className="loading-text">주변에 영업 중인 곳이 없습니다.</p>

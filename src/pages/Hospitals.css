@@ -1,38 +1,319 @@
 /* src/pages/Hospitals.css */
-.hospitals-top {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%;
+/* src/pages/Hospitals.css */
+
+.hp-container {
+  align-items: flex-start;
 }
-.hospitals-back {
-    background: none; border: none; cursor: pointer; color: #6B7280; font-size: 16px;
+
+.hp-title {
+  margin-bottom: 8px;
 }
-.hospitals-desc {
-    color: #6B7280; font-size: 14px; margin-bottom: 24px; width: 100%;
+
+/* 진료 중 필터 박스 */
+.hp-filter-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+  background-color: #f3f4f6;
+  padding: 12px;
+  border-radius: 12px;
 }
-.hospitals-list {
-    display: flex; flex-direction: column; gap: 16px; width: 100%;
+
+.hp-filter-text {
+  font-size: 14px;
+  font-weight: bold;
+  color: #374151;
 }
+
+/* 응급 안내 박스 레이아웃 완벽 수정 (이미지 깨짐 해결) */
+.hp-emergency-box {
+  background-color: #fef2f2;
+  border-color: #ef4444;
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column; /* 💡 핵심: 가로가 아닌 세로로 쌓이게 만듦 */
+  gap: 12px;
+}
+
+.hp-emergency-header {
+  display: flex;
+  align-items: flex-start;
+}
+
+.hp-emergency-icon {
+  margin-right: 8px;
+  font-size: 20px;
+}
+
+.hp-emergency-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hp-emergency-title {
+  color: #991b1b;
+  font-weight: bold;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.hp-emergency-sub {
+  color: #b91c1c;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* SOS 버튼 */
+.hp-sos-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+/* 펼쳐지는 SOS 메시지 박스 */
+.hp-sos-msg-box {
+  width: 90%;
+  padding: 16px;
+  background-color: white;
+  border-radius: 8px;
+  border: 2px solid #ef4444;
+  text-align: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.hp-sos-msg-guide {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0 0 8px 0;
+}
+
+.hp-sos-msg-jp {
+  font-size: 22px;
+  font-weight: bold;
+  color: #dc2626;
+  margin: 0 0 8px 0;
+  word-break: keep-all;
+}
+
+.hp-sos-msg-kr {
+  font-size: 14px;
+  color: #4b5563;
+  margin: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 상태별 텍스트 및 레이아웃 */
+.hp-loading-text {
+  width: 100%;
+  text-align: center;
+  padding: 40px 0;
+  color: #6b7280;
+}
+
+.hp-empty-box {
+  width: 100%;
+  text-align: center;
+  padding: 40px 0;
+}
+
+.hp-empty-title {
+  color: #ef4444;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.hp-empty-desc {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.hp-list-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 카드 스타일링 */
 .hospital-card {
-    background: white; padding: 20px; border-radius: 16px; border: 1px solid #E5E7EB; 
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
-.hospital-header-row {
-    display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;
+
+.hp-card-emergency {
+  border: 2px solid #ef4444;
 }
-.hospital-name-kr { margin: 0 0 4px 0; font-size: 18px; color: #111827; }
-.hospital-name-jp { margin: 0; font-size: 14px; color: #4B5563; }
-.hospital-distance {
-    background: #EFF6FF; color: #1D4ED8; padding: 4px 8px; border-radius: 8px; font-size: 14px; font-weight: bold;
+
+.hp-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
 }
-.hospital-address {
-    margin: 0 0 12px 0; font-size: 13px; color: #6B7280;
+
+.hp-card-name {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  color: #111827;
+  word-break: keep-all;
 }
-.hospital-langs {
-    display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+
+.hp-badge-emergency {
+  font-size: 12px;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  display: inline-block;
+  margin-top: 4px;
 }
-.hospital-lang-badge {
-    background: #F3F4F6; color: #374151; padding: 4px 8px; border-radius: 4px; font-size: 12px;
+
+.hp-card-dist {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+.hp-card-addr {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* 버튼 스타일링 */
+.map-btn {
+  width: 100%;
+  padding: 12px;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.hp-btn-emergency {
+  background-color: #ef4444;
+}
+.hp-btn-normal {
+  background-color: #3b82f6;
+}
+
+.full-map-btn {
+  width: 100%;
+  padding: 16px;
+  margin-top: 8px;
+  margin-bottom: 40px;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.hp-full-btn-emergency {
+  background-color: #dc2626;
+}
+.hp-full-btn-normal {
+  background-color: #2563eb;
+}
+
+/* 토글 스위치 (기존 유지) */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #d1d5db;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #3b82f6;
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }
 .map-btn {
-    width: 100%; padding: 12px; background: #3B82F6; color: white; border: none; 
-    border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer;
+  width: 100%;
+  padding: 12px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
 }

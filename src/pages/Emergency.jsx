@@ -65,6 +65,12 @@ function Emergency() {
                 ))}
             </div>
 
+            <div style={{ textAlign: 'center', marginTop: '24px', marginBottom: '8px' }}>
+                <p style={{ fontSize: '13px', color: '#6B7280', margin: 0 }}>
+                    ※ 로밍 폰에서도 119를 누르면 일본 구급대로 연결됩니다.
+                </p>
+            </div>
+
             <a href="tel:119" className="call-btn">
                 📞 일본 119 전화걸기
             </a>
