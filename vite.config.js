@@ -10,7 +10,7 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'], 
       manifest: {
         name: 'SafeTrip Japan',
-        short_name: 'SafeTrip',
+        short_name: '일본여행중아플때',
         description: '일본 여행 영유아 질의응답 및 병원 안내',
         theme_color: '#1F2937', 
         background_color: '#F9FAFB',

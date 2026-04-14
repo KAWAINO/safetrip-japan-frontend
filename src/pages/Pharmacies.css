@@ -155,3 +155,61 @@
 .full-map-btn.btn-pharmacy-dark {
   background-color: #2563eb;
 }
+
+/* --- 제휴 배너(수익화 슬롯) 스타일 --- */
+.affiliate-banner {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(253, 230, 138, 0.5); /* 노란빛 그림자 */
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 터치(클릭) 했을 때 살짝 눌리는 애니메이션 효과 */
+.affiliate-banner:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 4px -1px rgba(253, 230, 138, 0.4);
+}
+
+.affiliate-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.affiliate-badge {
+  font-size: 10px;
+  color: #b45309;
+  font-weight: bold;
+  background-color: #fef08a;
+  padding: 2px 6px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.affiliate-title {
+  margin: 0;
+  color: #92400e;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.affiliate-desc {
+  margin: 0;
+  color: #b45309;
+  font-size: 12px;
+}
+
+.affiliate-icon {
+  font-size: 32px;
+}

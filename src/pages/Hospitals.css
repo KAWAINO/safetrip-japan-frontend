@@ -317,3 +317,28 @@ input:checked + .slider:before {
   font-weight: bold;
   cursor: pointer;
 }
+
+.hp-page-title {
+  margin-bottom: 12px;
+  /* 원래 앱의 타이틀처럼 가운데 정렬을 유지합니다 */
+  text-align: center;
+}
+
+.hp-search-wrap {
+  display: flex;
+  justify-content: flex-end; /* 오른쪽 끝으로 밀어내기 */
+  margin-bottom: 16px;
+}
+
+.hp-search-btn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  font-size: 13px;
+  color: #334155;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap; /* 💥 글자가 두 줄로 깨지는 것을 막아주는 핵심 속성! */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}

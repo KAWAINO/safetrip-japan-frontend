@@ -1,7 +1,9 @@
+// src/pages/Hospitals.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import './Hospitals.css'; 
+import LocationSearchModal from '../components/LocationSearchModal';
 
 const loadGooglePlacesService = () => {
   return new Promise((resolve, reject) => {
@@ -20,53 +22,56 @@ const loadGooglePlacesService = () => {
   });
 };
 
+// 💡 에러 해결 1: 화면 렌더링과 상관없는 계산 함수는 컴포넌트 바깥으로 뺐습니다.
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; 
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+};
+
 function Hospitals() {
     const navigate = useNavigate();
     const [hospitals, setHospitals] = useState([]);
-    const [loading, setLoading] = useState(true);
+    
+    // 💡 에러 해결 3: GPS 권한에 따라 초기 로딩/에러 상태를 동적으로 세팅
+    const [loading, setLoading] = useState(Boolean(navigator.geolocation));
+    const [locationError, setLocationError] = useState(!navigator.geolocation);
+    
     const [isOpenOnly, setIsOpenOnly] = useState(true);
     const [mode, setMode] = useState('normal'); 
     const [showAmbulanceMsg, setShowAmbulanceMsg] = useState(false);
 
     const [userLocation, setUserLocation] = useState(null);
-    const [locationError, setLocationError] = useState(false);
+    
+    // 수동 검색 모달 상태
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    // 현재 검색된 지역 이름
+    const [searchedLocationName, setSearchedLocationName] = useState("내 주변");
 
-    // 💡 테스트용 나고야역 고정 위치
-    const MY_LOCATION = { lat: 35.1709, lng: 136.8815 };
-
-    // 1️⃣ 컴포넌트 마운트 시 위치 가져오기
+    // 1️⃣ 위치 가져오기
     useEffect(() => {
-        // ------------------------------------------------------------------
-        // 🚨 [테스트 모드] 한국에서 일본 검색을 테스트하고 싶다면 아래 두 줄의 주석을 푸세요!
-        // (아래 두 줄이 실행되면, 그 밑에 있는 진짜 GPS 로직은 무시됩니다.)
-        // ------------------------------------------------------------------
-        // setUserLocation(MY_LOCATION);
-        // return; 
-        // ------------------------------------------------------------------
+        if (!navigator.geolocation) return; // GPS 미지원 시 즉시 종료
 
-        // ✅ [실전 모드] 실제 스마트폰 GPS 로직
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    setUserLocation({
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    });
-                },
-                (error) => {
-                    console.error("GPS 권한 에러:", error);
-                    setLocationError(true);
-                    setLoading(false);
-                },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-            );
-        } else {
-            setLocationError(true);
-            setLoading(false);
-        }
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                setUserLocation({
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                });
+            },
+            (error) => {
+                console.error("GPS 권한 에러:", error);
+                setLocationError(true);
+                setLoading(false);
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
     }, []);
 
-    // 2️⃣ 위치(userLocation)가 파악되면 병원 검색 API 실행하기
+    // 2️⃣ 약국 검색 API
     useEffect(() => {
         if (!userLocation) return; 
 
@@ -124,26 +129,47 @@ function Hospitals() {
         fetchHospitals();
     }, [userLocation, isOpenOnly]); 
 
-    const calculateDistance = (lat1, lon1, lat2, lon2) => {
-        const R = 6371; 
-        const dLat = (lat2 - lat1) * (Math.PI / 180);
-        const dLon = (lon2 - lon1) * (Math.PI / 180);
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
+    // 3️⃣ 수동 검색 함수
+    const handleManualSearch = async (keyword) => {
+        try {
+            const placesService = await loadGooglePlacesService();
+            const request = {
+                query: keyword + " 일본", 
+                fields: ['name', 'geometry']
+            };
+
+            placesService.findPlaceFromQuery(request, (results, status) => {
+                if (status === window.google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
+                    const place = results[0];
+                    const lat = place.geometry.location.lat();
+                    const lng = place.geometry.location.lng();
+                    const locationName = place.name || keyword;
+
+                    setUserLocation({ lat, lng });
+                    setSearchedLocationName(locationName);
+                    setIsModalOpen(false); 
+                } else {
+                    alert("검색 결과가 없습니다. 지역명을 더 정확히 입력해주세요.");
+                }
+            });
+        } catch (error) {
+            console.error("검색 중 오류 발생:", error);
+            alert("검색 중 오류가 발생했습니다.");
+        }
     };
 
+    // 💡 에러 해결 2: window.location.assign() 사용으로 변경
     const openDirections = (hospital) => {
         const encodedName = encodeURIComponent(hospital.nameKr);
         const url = `https://www.google.com/maps/dir/?api=1&destination=${encodedName}&destination_place_id=${hospital.id}`;
-        window.location.href = url; 
+        window.location.assign(url); 
     };
 
     const openFullMap = () => {
         if (!userLocation) return;
         const query = encodeURIComponent(mode === 'emergency' ? '夜間休日急病診療所 救急病院' : '小児科');
         const url = `https://www.google.com/maps/search/${query}/@${userLocation.lat},${userLocation.lng},15z`;
-        window.location.href = url; 
+        window.location.assign(url); 
     };
 
     return (
@@ -151,7 +177,19 @@ function Hospitals() {
             <Header onBack={() => navigate(-1)} />
             
             <div className="container hp-container">
-                <h2 className="title hp-title">근처 소아과</h2>
+                
+                {/* 💡 CSS로 깔끔하게 분리된 상단 영역 */}
+                <h2 className="title hp-title hp-page-title">근처 소아과</h2>
+                
+                <div className="hp-search-wrap">
+                    <button 
+                        onClick={() => setIsModalOpen(true)}
+                        className="hp-search-btn"
+                    >
+                        🔍 다른 지역 검색
+                    </button>
+                </div>
+                {/* ------------------------------------- */}
                 
                 <div className="hp-filter-box">
                     <span className="hp-filter-text">🏥 현재 진료 중인 곳만 보기</span>
@@ -166,7 +204,9 @@ function Hospitals() {
                     </label>
                 </div>
 
-                <p className="hospitals-desc">내 주변에서 가장 가까운 소아과 5곳</p>
+                <p>
+                    <b>[{searchedLocationName}]</b> 에서 가장 가까운 소아과 5곳
+                </p>
 
                 {locationError ? (
                     <div className="hp-empty-box">
@@ -265,6 +305,12 @@ function Hospitals() {
                     </div>
                 )}
             </div>
+
+            <LocationSearchModal 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+                onSearch={handleManualSearch} 
+            />
         </>
     );
 }
