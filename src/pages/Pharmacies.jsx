@@ -217,7 +217,7 @@ function Pharmacies() {
 
 
                 {/* 💸 [수익화 파이프라인] 드럭스토어 탭일 때만 보이는 제휴 배너! */}
-                {/* {searchType === 'drugstore' && (
+                {searchType === 'drugstore' && (
                     <div 
                         className="affiliate-banner"
                         onClick={() => setIsCouponModalOpen(true)} 
@@ -229,7 +229,7 @@ function Pharmacies() {
                         </div>
                         <div className="affiliate-icon">🛍️</div>
                     </div>
-                )} */}
+                )}
 
 
                 {!locationError && userLocation && (

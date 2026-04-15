@@ -110,7 +110,7 @@
   font-weight: bold;
 }
 .coupon-detail-header h2 {
-  margin: 20px 0 8px 0;
+  margin: 40px 0 8px 0;
   font-size: 22px;
   color: #111827;
 }
@@ -174,11 +174,18 @@
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 16px;
+  /* 💡 패딩을 16px에서 12px로 줄여서 뚱뚱한 느낌을 없앱니다 */
+  padding: 12px;
   width: 100%;
   font-size: 15px;
   font-weight: bold;
   cursor: pointer;
+
+  /* 💡 JSX에서 빼온 속성들 추가 */
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box; /* 가로 길이가 화면을 삐져나가지 않게 꽉 잡아줍니다 */
 }
 
 .conditions-box {
@@ -212,4 +219,143 @@
 }
 .coupon-close-btn:active {
   background-color: #e5e7eb;
+}
+
+.coupon-list-body {
+  padding: 16px;
+
+  /* 💡 스크롤을 위한 핵심 설정 */
+  max-height: 50vh; /* 화면 전체 높이의 50% 이상은 커지지 않도록 막습니다 */
+  overflow-y: auto; /* 내용이 넘치면 세로 스크롤바를 만듭니다 */
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* (선택사항) 데스크톱이나 안드로이드에서 스크롤바 예쁘게 만들기 */
+.coupon-list-body::-webkit-scrollbar {
+  width: 6px;
+}
+.coupon-list-body::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+.coupon-list-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+/* --- 카테고리 탭 스타일 --- */
+.coupon-tabs {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  overflow-x: auto; /* 화면 좁을 때 가로 스크롤 가능하게 */
+  padding-bottom: 4px;
+}
+
+/* 탭 가로 스크롤바 숨기기 (깔끔한 UI용) */
+.coupon-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.coupon-tabs .tab-btn {
+  flex-shrink: 0;
+  padding: 8px 5px 8px 5px;
+  border: 1px solid #e5e7eb;
+  background-color: white;
+  color: #64748b;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.coupon-tabs .tab-btn.active {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+/* --- 지역 뱃지 & 타이틀 정렬 --- */
+.brand-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.brand-title-row h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #111827;
+}
+
+.region-badge {
+  font-size: 11px;
+  font-weight: bold;
+  background-color: #fef08a; /* 눈에 띄는 노란색 뱃지 */
+  color: #a16207;
+  padding: 2px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+/* 상세 화면 타이틀 중앙 정렬 맞추기 */
+.detail-title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 40px 0 8px 0;
+}
+
+.detail-title-wrapper h2 {
+  margin: 0;
+  font-size: 22px;
+  color: #111827;
+}
+
+/* --- 준비 중 화면 --- */
+.empty-coupon-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* --- CS 방어용 안내 박스 스타일 --- */
+.coupon-notice-box {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin: 16px 16px 12px 16px; /* 좌우 여백을 주어 리스트와 맞춤 */
+  padding: 12px;
+}
+
+.notice-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: #ef4444; /* 약간의 경고 느낌을 주는 붉은색 */
+  margin-bottom: 6px;
+}
+
+.notice-list {
+  margin: 0;
+  padding-left: 16px; /* bullet 점이 들어갈 공간 */
+  font-size: 11px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.notice-list li {
+  margin-bottom: 4px;
+}
+
+.notice-list li:last-child {
+  margin-bottom: 0;
 }

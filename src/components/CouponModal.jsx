@@ -1,55 +1,23 @@
 // src/components/CouponModal.jsx
 import React, { useState } from 'react';
 import './CouponModal.css';
+import { couponData } from '../data/couponData'; 
 
 function CouponModal({ isOpen, onClose }) {
-    // 어떤 브랜드의 쿠폰을 볼지 선택하는 상태 (초기값은 목록을 보여주기 위해 null)
     const [selectedBrand, setSelectedBrand] = useState(null);
+    // 💡 활성화된 탭 상태 관리 (기본값은 드럭스토어)
+    const [activeTab, setActiveTab] = useState('drug'); 
 
     if (!isOpen) return null;
 
-    // 💡 나중에 진짜 바코드 이미지 경로를 구하시면 imageUrl에 넣으시면 됩니다!
-    const couponData = [
-        {
-            id: 'matsukiyo',
-            name: '마츠모토키요시',
-            discount: '면세 10% + 최대 7% 추가 할인',
-            type: 'link',
-            imageUrl: 'https://www.japanreadygo.com/drugstore/matsukiyo', // 예: '/images/matsukiyo-coupon.png'
-            conditions: ['1만 엔 이상 구매 시 3% 추가 할인', '3만 엔 이상 구매 시 5% 추가 할인', '5만 엔 이상 구매 시 7% 추가 할인', '결제 전 점원에게 바코드 제시']
-        },
-        {
-            id: 'sundrug',
-            name: '선드럭 (SUNDRUG)',
-            discount: '면세 10% + 최대 7% 추가 할인',
-            type: 'link',
-            imageUrl: 'https://www.japanreadygo.com/drugstore/sundrug', 
-            conditions: ['1만 엔 이상 구매 시 3% 추가 할인', '3만 엔 이상 구매 시 5% 추가 할인', '5만 엔 이상 구매 시 7% 추가 할인', '화장품 등 일부 품목 제외']
-        },
-        {
-            id: 'donki',
-            name: '돈키호테',
-            discount: '면세 10% + 5% 추가 할인',
-            type: 'link', // 돈키호테는 보통 전용 웹링크를 씁니다
-            linkUrl: 'https://japanportal.donki-global.com/coupon/cp001_ko.html', // 임시 공용 링크
-            conditions: ['세금 불포함 1만 엔 이상 구매 시 적용', '아래 버튼을 눌러 전용 쿠폰 페이지를 점원에게 제시', '술, 담배 등 일부 품목 제외']
-        }
-    ];
-
-    // 가짜 바코드 생성 함수 (이미지 넣기 전 임시용)
-    const renderFakeBarcode = () => (
-        <div className="fake-barcode-box">
-            <div className="fake-lines">
-                {Array(25).fill(0).map((_, i) => (
-                    <div key={i} style={{ width: `${Math.floor(Math.random() * 4) + 1}px`, height: '50px', backgroundColor: '#111827', marginRight: '2px' }} />
-                ))}
-            </div>
-            <p>바코드 이미지 준비 중</p>
-        </div>
+    // 💡 현재 선택된 탭(카테고리)에 해당하는 쿠폰만 필터링합니다.
+    const filteredCoupons = couponData.filter(coupon => 
+        coupon.categories.includes(activeTab)
     );
 
     const handleClose = () => {
-        setSelectedBrand(null); // 닫을 때 목록으로 초기화
+        setSelectedBrand(null);
+        setActiveTab('drug'); // 닫을 때 탭 초기화
         onClose();
     };
 
@@ -61,54 +29,91 @@ function CouponModal({ isOpen, onClose }) {
                 {!selectedBrand ? (
                     <>
                         <div className="coupon-list-header">
-                            <h2>일본 쇼핑 할인 쿠폰북 🏷️</h2>
-                            <p>원하는 브랜드를 선택해 주세요.</p>
+                            <h2>일본 쇼핑 할인 쿠폰팩 🎁</h2>
+                            <p>원하는 카테고리를 선택해 주세요.</p>
+                            
+                            {/* 💡 카테고리 탭 영역 추가 */}
+                            <div className="coupon-tabs">
+                                <button 
+                                    className={`tab-btn ${activeTab === 'drug' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('drug')}
+                                >💊 드럭스토어</button>
+                                <button 
+                                    className={`tab-btn ${activeTab === 'electronics' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('electronics')}
+                                >💻 가전/잡화</button>
+                                <button 
+                                    className={`tab-btn ${activeTab === 'department' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('department')}
+                                >🛍️ 백화점/아울렛</button>
+                            </div>
                         </div>
+
+                        {/* 💡 여기에 CS 방어용 안내 문구 박스를 추가합니다! */}
+                        <div className="coupon-notice-box">
+                            <div className="notice-title">🚨 쿠폰 이용 전 필독 안내</div>
+                            <ul className="notice-list">
+                                <li>발급 전 연결된 페이지(패키지 옵션 → 패키지 정보)에서 정확한 사용처 및 유의사항을 반드시 확인해 주세요.</li>
+                                <li>대형 브랜드 쿠폰은 특정 지역이 표기되어 있어도 일본 전국 매장에서 사용 가능합니다.</li>
+                            </ul>
+                        </div>
+
                         <div className="coupon-list-body">
-                            {couponData.map(brand => (
-                                <button key={brand.id} className="brand-select-btn" onClick={() => setSelectedBrand(brand)}>
-                                    <div className="brand-info">
-                                        <h3>{brand.name}</h3>
-                                        <p>{brand.discount}</p>
-                                    </div>
-                                    <span>👉</span>
-                                </button>
-                            ))}
+                            {/* 필터링된 쿠폰이 있을 때만 리스트를 그려줍니다 */}
+                            {filteredCoupons.length > 0 ? (
+                                filteredCoupons.map(brand => (
+                                    <button key={brand.id} className="brand-select-btn" onClick={() => setSelectedBrand(brand)}>
+                                        <div className="brand-info">
+                                            <div className="brand-title-row">
+                                                <h3>{brand.name}</h3>
+                                                {/* 💡 region 데이터가 있으면 예쁜 뱃지를 그려줍니다 */}
+                                                {brand.region && <span className="region-badge">{brand.region}</span>}
+                                            </div>
+                                            <p>{brand.discount}</p>
+                                        </div>
+                                        <span>👉</span>
+                                    </button>
+                                ))
+                            ) : (
+                                /* 데이터가 없는 탭을 눌렀을 때의 빈 화면 처리 */
+                                <div className="empty-coupon-message">
+                                    해당 카테고리의 쿠폰을 열심히 준비 중입니다! 🙇‍♂️
+                                </div>
+                            )}
                         </div>
                     </>
                 ) : (
-                /* 2. 개별 쿠폰 상세 화면 */
+                /* 2. 개별 쿠폰 상세 화면 (이전 코드와 동일하되 지역 정보만 윗부분에 추가) */
                     <>
                         <div className="coupon-detail-header">
                             <button className="back-btn" onClick={() => setSelectedBrand(null)}>⬅ 목록으로</button>
-                            <h2>{selectedBrand.name}</h2>
+                            
+                            <div className="detail-title-wrapper">
+                                <h2>{selectedBrand.name}</h2>
+                                {selectedBrand.region && <span className="region-badge">{selectedBrand.region}</span>}
+                            </div>
+                            
                             <p className="highlight-discount">{selectedBrand.discount}</p>
                         </div>
                         
                         <div className="coupon-detail-body">
-                            {selectedBrand.type === 'barcode' ? (
-                                <div className="barcode-container">
-                                    <p className="instruction">계산 시 점원에게 아래 화면을 보여주세요.</p>
-                                    {selectedBrand.imageUrl ? (
-                                        <img src={selectedBrand.imageUrl} alt={`${selectedBrand.name} 바코드`} className="real-barcode-img" />
-                                    ) : (
-                                        renderFakeBarcode()
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="link-container">
-                                    <p className="instruction">돈키호테는 전용 웹페이지에서 발급됩니다.</p>
-                                    <button className="open-link-btn" onClick={() => window.open(selectedBrand.linkUrl, '_blank')}>
-                                        🔗 할인 쿠폰 페이지 열기
-                                    </button>
-                                </div>
-                            )}
+                            <div className="link-container">
+                                <p className="instruction">아래 버튼을 눌러 모바일 쿠폰을 발급받으세요.</p>
+                                <a 
+                                    href={selectedBrand.linkUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="open-link-btn"
+                                >
+                                    🔗 할인 쿠폰 페이지 열기
+                                </a>
+                            </div>
 
                             <div className="conditions-box">
                                 <h4>유의사항</h4>
                                 <ul>
                                     {selectedBrand.conditions.map((cond, idx) => (
-                                        <li key={idx}>• {cond}</li>
+                                        <li key={idx}>{cond}</li>
                                     ))}
                                 </ul>
                             </div>
