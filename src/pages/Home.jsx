@@ -7,7 +7,7 @@ import './Home.css';
 function Home() {
     const navigate = useNavigate();
     
-    // 💡 단계: start(시작) -> child_age(나이 선택) -> child_dest(목적지 선택)
+    // 💡 단계: start(시작) -> child_age(나이 선택) -> child_dest(소아 목적지) / adult_dest(성인 목적지)
     const [step, setStep] = useState('start');
     
     // 💡 선택한 아이의 연령 정보 저장
@@ -17,6 +17,7 @@ function Home() {
     const handleBack = () => {
         if (step === 'child_age') setStep('start');
         else if (step === 'child_dest') setStep('child_age');
+        else if (step === 'adult_dest') setStep('start'); // 💡 성인 목적지에서 뒤로가기
     };
 
     const handleAgeSelect = (id, label) => {
@@ -37,6 +38,11 @@ function Home() {
                 ageLabel: childAgeLabel 
             } 
         });
+    };
+
+    // 임산부 선택 시 문진표 페이지
+    const handlePregnantClick = () => {
+        navigate('/question/pregnant');
     };
 
     return (
@@ -61,15 +67,21 @@ function Home() {
                             <h1>누구의 증상을 설명할까요?</h1>
                         </div>
 
-                        <button className="target-btn" onClick={() => navigate('/pharmacy-speed', { state: { type: 'adult' } })}>
-                            <span className="emoji-icon">👩</span> 성인 (본인 및 동행자)
-                        </button>
-
                         <button className="target-btn" onClick={() => setStep('child_age')}>
-                            <span className="emoji-icon">👶</span> 소아 (어린이)
+                            <span className="emoji-icon">🧸</span> 소아 (어린이)
                         </button>
 
-                        {/* 💡 신규 추가: 번역 없이 바로 지도/위치를 보고 싶은 유저를 위한 빠른 찾기 */}
+                        {/* 💡 신규 추가: 임산부 버튼 (태교 여행 타겟) */}
+                        <button className="target-btn" onClick={handlePregnantClick}>
+                            <span className="emoji-icon">🤰🏻</span> 임산부 (태교 여행)
+                        </button>
+
+                        {/* 💡 성인 클릭 시 adult_dest 단계로 이동하도록 변경 */}
+                        <button className="target-btn" onClick={() => setStep('adult_dest')}>
+                            <span className="emoji-icon">💼</span> 성인 (본인 및 동행자)
+                        </button>
+
+                        {/* 빠른 찾기 영역 */}
                         <div style={{ marginTop: '32px', width: '100%' }}>
                             <h3 style={{ fontSize: '15px', color: '#6B7280', marginBottom: '12px', textAlign: 'center' }}>
                                 📍 번역 없이 내 주변 시설 바로 찾기
@@ -95,6 +107,33 @@ function Home() {
                                 </button>
                             </div>
                         </div>
+                    </div>
+                )}
+
+                {/* 💡 신규 추가: 성인 전용 - 목적지 선택 */}
+                {step === 'adult_dest' && (
+                    <div className="step-wrapper">
+                        <div className="title-area">
+                            <h1>어디로 가시나요?</h1>
+                        </div>
+
+                        {/* 서비스 준비 중 알림 버튼 */}
+                        <button 
+                            className="action-btn hospital-btn" 
+                            onClick={() => alert('성인 병원 진료(정밀 문진) 서비스는 현재 준비 중입니다. 🙇‍♂️\n조금만 기다려 주세요!')}
+                        >
+                            <span className="emoji-icon-large">🏥</span>
+                            <span>병원 진료 (정밀 문진)</span>
+                        </button>
+
+                        {/* 기존 성인 약국 이동 로직 연결 */}
+                        <button 
+                            className="action-btn pharmacy-btn" 
+                            onClick={() => navigate('/pharmacy-speed', { state: { type: 'adult' } })}
+                        >
+                            <span className="emoji-icon-large">💊</span>
+                            <span>약국 / 드럭스토어 (간편 소통)</span>
+                        </button>
                     </div>
                 )}
 

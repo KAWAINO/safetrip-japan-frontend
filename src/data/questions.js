@@ -176,5 +176,49 @@ export const questions = {
         { label: "전혀 못 먹음", value: "eat_none", jp: "全く食べられず、水分も摂れません。" }
       ]
     }
-  ]
+  ],
+  pregnant: [
+        {
+            id: "preg_weeks",
+            question: "현재 임신 몇 주 차이신가요?",
+            type: "single",
+            options: [
+                { label: "초기 (1~13주)", value: "first_trimester", jp: "妊娠初期 (1~13週)" },
+                { label: "중기 (14~28주)", value: "second_trimester", jp: "妊娠中期 (14~28週)" },
+                { label: "후기 (29주 이상~)", value: "third_trimester", jp: "妊娠後期 (29週~)" },
+                { label: "정확히 모름", value: "unknown", jp: "正確な週数は分かりません" }
+            ]
+        },
+        {
+            id: "preg_symptom",
+            question: "가장 불편한 증상은 무엇인가요? (중복 선택 가능)",
+            type: "multi",
+            options: [
+                { label: "🩸 하혈 / 출혈이 있어요", value: "bleeding", jp: "出血があります" },
+                { label: "⚡ 배 뭉침 / 복통이 심해요", value: "abdominal_pain", jp: "お腹の張り・ひどい腹痛があります" },
+                { label: "🤢 입덧 / 구토가 멈추지 않아요", value: "nausea", jp: "つわり・吐き気が止まりません" },
+                { label: "🔥 열이 나고 감기 기운이 있어요", value: "fever_cold", jp: "発熱・風邪の症状があります" },
+                { label: "💦 양수가 터진 것 같아요", value: "water_broke", jp: "破水したかもしれません" },
+                // { label: "기타 (직접 설명할게요)", value: "other", jp: "その他の症状（直接説明します）" }
+            ]
+        },
+        // {
+        //     id: "preg_medication",
+        //     question: "현재 복용 중인 약이나 영양제가 있나요?",
+        //     type: "single",
+        //     options: [
+        //         { label: "네 (철분제, 엽산 등 포함)", value: "yes", jp: "現在服用している薬があります（鉄剤、葉酸などを含む）" },
+        //         { label: "아니요", value: "no", jp: "現在服用中の薬はありません" }
+        //     ]
+        // },
+        // {
+        //     id: "preg_allergy",
+        //     question: "약물 알레르기가 있나요?",
+        //     type: "single",
+        //     options: [
+        //         { label: "네, 있습니다", value: "yes", jp: "薬アレルギーがあります" },
+        //         { label: "아니요, 없습니다", value: "no", jp: "薬物アレルギーはありません" }
+        //     ]
+        // }
+    ]
 };

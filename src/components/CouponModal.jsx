@@ -96,7 +96,7 @@ function CouponModal({ isOpen, onClose }) {
                             <p className="highlight-discount">{selectedBrand.discount}</p>
                         </div>
                         
-                        <div className="coupon-detail-body">
+                        {/* <div className="coupon-detail-body">
                             <div className="link-container">
                                 <p className="instruction">아래 버튼을 눌러 모바일 쿠폰을 발급받으세요.</p>
                                 <a 
@@ -109,6 +109,55 @@ function CouponModal({ isOpen, onClose }) {
                                 </a>
                             </div>
 
+                            <div className="conditions-box">
+                                <h4>유의사항</h4>
+                                <ul>
+                                    {selectedBrand.conditions.map((cond, idx) => (
+                                        <li key={idx}>{cond}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div> */}
+                        <div className="coupon-detail-body">
+                            {/* 1. 쿠폰 바코드 이미지 영역 (UX 최우선) */}
+                            <div className="barcode-container">
+                                <p className="instruction">계산 시 점원에게 아래 화면을 보여주세요 📱</p>
+                                {selectedBrand.type === 'image' && selectedBrand.imageUrl ? (
+                                    <img 
+                                        src={selectedBrand.imageUrl} 
+                                        alt={`${selectedBrand.name} 쿠폰 바코드`} 
+                                        className="real-barcode-img" 
+                                    />
+                                ) : (
+                                    /* 링크 방식이 남아있을 경우를 대비한 폴백(Fallback) */
+                                    <a href={selectedBrand.linkUrl} target="_blank" rel="noopener noreferrer" className="open-link-btn">
+                                        🔗 할인 쿠폰 페이지 열기
+                                    </a>
+                                )}
+                            </div>
+
+                            {/* 💡 2. 수익화 전용 배너 영역 (여기가 돈이 나오는 곳입니다!) */}
+                            <div className="sponsor-banner-container">
+                                <p className="sponsor-title">🛫 일본 여행 필수품 준비하셨나요?</p>
+                                <a 
+                                    href="https://affiliate.klook.com/기획자님_eSIM_제휴링크" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="sponsor-link-btn esim-btn"
+                                >
+                                    데이터 빵빵한 일본 eSIM 10% 할인받기 📶
+                                </a>
+                                <a 
+                                    href="https://기획자님_우버_제휴링크" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="sponsor-link-btn uber-btn"
+                                >
+                                    일본 우버(Uber) 택시 첫 탑승 무료 쿠폰 🚕
+                                </a>
+                            </div>
+
+                            {/* 3. 기존 유의사항 영역 */}
                             <div className="conditions-box">
                                 <h4>유의사항</h4>
                                 <ul>

@@ -342,3 +342,7 @@ input:checked + .slider:before {
   white-space: nowrap; /* 💥 글자가 두 줄로 깨지는 것을 막아주는 핵심 속성! */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
+
+.target-btn {
+  height: 70px;
+}
