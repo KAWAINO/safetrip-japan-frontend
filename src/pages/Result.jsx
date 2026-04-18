@@ -149,6 +149,7 @@ function Result() {
             </div>
 
             <div className="btn-area">
+
                 {/* 💡 임산부일 경우 산부인과 찾기로 문구 변경! */}
                 <button 
                     className="primary-btn location-btn" 
@@ -168,6 +169,24 @@ function Result() {
                         💊 근처 약국 / 드럭스토어 찾기
                     </button>
                 )}
+
+                {/* 💡 파파고 실시간 번역기 버튼 */}
+                <button 
+                    className="primary-btn" 
+                    style={{ 
+                        backgroundColor: '#00C73C', 
+                        color: 'white', 
+                        marginBottom: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
+                    }} 
+                    onClick={() => window.open('https://papago.naver.com/?sk=ko&tk=ja', '_blank')}
+                >
+                    <img src="/images/papago-icon.png" alt="파파고" style={{ width: '20px', height: '20px', borderRadius: '4px', backgroundColor: 'white', padding: '2px' }} />
+                    파파고 실시간 번역기 열기
+                </button>
 
                 <button className="primary-btn" style={{ backgroundColor: "#E5E7EB", color: "#4B5563" }} onClick={handleGoHome}>
                     🏠 처음으로 돌아가기

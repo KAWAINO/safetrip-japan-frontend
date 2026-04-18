@@ -2,22 +2,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
+import Footer from '../components/Footer';
 import './Home.css';
 
 function Home() {
     const navigate = useNavigate();
     
-    // 💡 단계: start(시작) -> child_age(나이 선택) -> child_dest(소아 목적지) / adult_dest(성인 목적지)
+    // 💡 단계: start(시작) -> child_age / adult_dest / quick_hospital(신규!)
     const [step, setStep] = useState('start');
     
-    // 💡 선택한 아이의 연령 정보 저장
+    // 선택한 아이의 연령 정보 저장
     const [childAgeLabel, setChildAgeLabel] = useState('');
     const [childAgeId, setChildAgeId] = useState('');
 
     const handleBack = () => {
         if (step === 'child_age') setStep('start');
         else if (step === 'child_dest') setStep('child_age');
-        else if (step === 'adult_dest') setStep('start'); // 💡 성인 목적지에서 뒤로가기
+        else if (step === 'adult_dest') setStep('start'); 
+        else if (step === 'quick_hospital') setStep('start'); // 💡 빠른 병원 찾기에서 뒤로가기
     };
 
     const handleAgeSelect = (id, label) => {
@@ -71,12 +73,10 @@ function Home() {
                             <span className="emoji-icon">🧸</span> 소아 (어린이)
                         </button>
 
-                        {/* 💡 신규 추가: 임산부 버튼 (태교 여행 타겟) */}
                         <button className="target-btn" onClick={handlePregnantClick}>
                             <span className="emoji-icon">🤰🏻</span> 임산부 (태교 여행)
                         </button>
 
-                        {/* 💡 성인 클릭 시 adult_dest 단계로 이동하도록 변경 */}
                         <button className="target-btn" onClick={() => setStep('adult_dest')}>
                             <span className="emoji-icon">💼</span> 성인 (본인 및 동행자)
                         </button>
@@ -87,14 +87,15 @@ function Home() {
                                 📍 번역 없이 내 주변 시설 바로 찾기
                             </h3>
                             <div style={{ display: 'flex', gap: '10px' }}>
+                                {/* 💡 수정: 바로 넘어가지 않고 quick_hospital 단계로 이동 */}
                                 <button 
-                                    onClick={() => navigate('/hospitals')}
+                                    onClick={() => setStep('quick_hospital')}
                                     style={{ 
                                         flex: 1, padding: '14px 10px', borderRadius: '12px', 
                                         backgroundColor: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE', 
                                         fontWeight: 'bold', fontSize: '14px', cursor: 'pointer' 
                                     }}>
-                                    🏥 근처 소아과
+                                    🏥 근처 병원
                                 </button>
                                 <button 
                                     onClick={() => navigate('/pharmacies')}
@@ -110,14 +111,40 @@ function Home() {
                     </div>
                 )}
 
-                {/* 💡 신규 추가: 성인 전용 - 목적지 선택 */}
+                {/* 💡 신규 추가: 빠른 병원 찾기 - 소아과 vs 산부인과 선택 */}
+                {step === 'quick_hospital' && (
+                    <div className="step-wrapper">
+                        <div className="title-area">
+                            <h1>어떤 병원을 찾으시나요?</h1>
+                            <p>현재 위치 주변의 병원을 바로 찾아드립니다.</p>
+                        </div>
+
+                        <button 
+                            className="action-btn hospital-btn" 
+                            onClick={() => navigate('/hospitals', { state: { category: 'pediatrics' } })}
+                        >
+                            <span className="emoji-icon-large">🧸</span>
+                            <span>근처 소아과 찾기</span>
+                        </button>
+
+                        <button 
+                            className="action-btn hospital-btn" 
+                            style={{ borderLeftColor: '#DB2777' }} /* 임산부 핑크색 포인트 테두리 */
+                            onClick={() => navigate('/hospitals', { state: { category: 'obgyn' } })}
+                        >
+                            <span className="emoji-icon-large">🤰🏻</span>
+                            <span>근처 산부인과 찾기</span>
+                        </button>
+                    </div>
+                )}
+
+                {/* 성인 전용 - 목적지 선택 */}
                 {step === 'adult_dest' && (
                     <div className="step-wrapper">
                         <div className="title-area">
                             <h1>어디로 가시나요?</h1>
                         </div>
 
-                        {/* 서비스 준비 중 알림 버튼 */}
                         <button 
                             className="action-btn hospital-btn" 
                             onClick={() => alert('성인 병원 진료(정밀 문진) 서비스는 현재 준비 중입니다. 🙇‍♂️\n조금만 기다려 주세요!')}
@@ -126,7 +153,6 @@ function Home() {
                             <span>병원 진료 (정밀 문진)</span>
                         </button>
 
-                        {/* 기존 성인 약국 이동 로직 연결 */}
                         <button 
                             className="action-btn pharmacy-btn" 
                             onClick={() => navigate('/pharmacy-speed', { state: { type: 'adult' } })}
@@ -137,7 +163,7 @@ function Home() {
                     </div>
                 )}
 
-                {/* 2단계: 소아 전용 - 연령 우선 선택 */}
+                {/* 소아 전용 - 연령 우선 선택 */}
                 {step === 'child_age' && (
                     <div className="step-wrapper">
                         <div className="title-area">
@@ -157,7 +183,7 @@ function Home() {
                     </div>
                 )}
 
-                {/* 3단계: 소아 전용 - 목적지 선택 */}
+                {/* 소아 전용 - 목적지 선택 */}
                 {step === 'child_dest' && (
                     <div className="step-wrapper">
                         <div className="title-area">
@@ -187,10 +213,31 @@ function Home() {
 
                 {/* 하단 공통 응급 버튼 */}
                 <div className="btn-area home-emergency-area">
+
+                    <button 
+                        className="primary-btn" 
+                        style={{ 
+                            backgroundColor: '#E8F9EC', 
+                            color: '#00A332', 
+                            border: '1px solid #00C73C', 
+                            marginBottom: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px'
+                        }} 
+                        onClick={() => window.open('https://papago.naver.com/?sk=ko&tk=ja', '_blank')}
+                    >
+                        <img src="/images/papago-icon.png" alt="파파고" style={{ width: '18px', height: '18px' }} />
+                        현지인과 대화가 필요하다면? (파파고)
+                    </button>
+
                     <button className="primary-btn emergency-btn" onClick={() => navigate('/emergency')}>
                         🚨 응급 상황 (119 구급차)
                     </button>
                 </div>
+
+                <Footer />
             </div>
         </>
     );

@@ -1,28 +1,27 @@
 // src/pages/Hospitals.jsx
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/Header";
 import './Hospitals.css'; 
 import LocationSearchModal from '../components/LocationSearchModal';
 
 const loadGooglePlacesService = () => {
-  return new Promise((resolve, reject) => {
-    if (window.google && window.google.maps) {
-      resolve(new window.google.maps.places.PlacesService(document.createElement('div')));
-      return;
-    }
-    
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => resolve(new window.google.maps.places.PlacesService(document.createElement('div')));
-    script.onerror = (error) => reject(error);
-    document.head.appendChild(script);
-  });
+    return new Promise((resolve, reject) => {
+        if (window.google && window.google.maps) {
+            resolve(new window.google.maps.places.PlacesService(document.createElement('div')));
+            return;
+        }
+        
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`;
+        script.async = true;
+        script.defer = true;
+        script.onload = () => resolve(new window.google.maps.places.PlacesService(document.createElement('div')));
+        script.onerror = (error) => reject(error);
+        document.head.appendChild(script);
+    });
 };
 
-// 💡 에러 해결 1: 화면 렌더링과 상관없는 계산 함수는 컴포넌트 바깥으로 뺐습니다.
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371; 
     const dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -34,26 +33,76 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 
 function Hospitals() {
     const navigate = useNavigate();
+    const location = useLocation(); 
+    
+    const category = location.state?.category || 'pediatrics';
+
+    const contentMap = {
+        pediatrics: {
+            title: "근처 소아과",
+            keyword: "小児科", 
+            targetName: "소아과", 
+            themeColor: "#1D4ED8" 
+        },
+        obgyn: {
+            title: "근처 산부인과",
+            keyword: "産婦人科", 
+            targetName: "산부인과", 
+            themeColor: "#DB2777" 
+        }
+    };
+
+    const currentContent = contentMap[category];
+
     const [hospitals, setHospitals] = useState([]);
     
-    // 💡 에러 해결 3: GPS 권한에 따라 초기 로딩/에러 상태를 동적으로 세팅
-    const [loading, setLoading] = useState(Boolean(navigator.geolocation));
+    // 💡 1. 상태 초기값을 sessionStorage에서 먼저 찾아오도록 수정! (나갔다 와도 기억함)
+    const [isOpenOnly, setIsOpenOnly] = useState(() => {
+        const saved = sessionStorage.getItem('hp_isOpenOnly');
+        return saved !== null ? JSON.parse(saved) : true;
+    });
+
+    const [searchedLocationName, setSearchedLocationName] = useState(() => {
+        return sessionStorage.getItem('hp_locationName') || "내 주변";
+    });
+
+    const [userLocation, setUserLocation] = useState(() => {
+        const saved = sessionStorage.getItem('hp_userLocation');
+        return saved ? JSON.parse(saved) : null;
+    });
+
+    const [loading, setLoading] = useState(Boolean(navigator.geolocation) && !userLocation);
     const [locationError, setLocationError] = useState(!navigator.geolocation);
     
-    const [isOpenOnly, setIsOpenOnly] = useState(true);
     const [mode, setMode] = useState('normal'); 
     const [showAmbulanceMsg, setShowAmbulanceMsg] = useState(false);
-
-    const [userLocation, setUserLocation] = useState(null);
-    
-    // 수동 검색 모달 상태
     const [isModalOpen, setIsModalOpen] = useState(false);
-    // 현재 검색된 지역 이름
-    const [searchedLocationName, setSearchedLocationName] = useState("내 주변");
+
+    // 💡 2. 상태가 바뀔 때마다 sessionStorage에 실시간으로 저장해두기
+    useEffect(() => {
+        sessionStorage.setItem('hp_isOpenOnly', JSON.stringify(isOpenOnly));
+    }, [isOpenOnly]);
+
+    useEffect(() => {
+        sessionStorage.setItem('hp_locationName', searchedLocationName);
+    }, [searchedLocationName]);
+
+    useEffect(() => {
+        if (userLocation) {
+            sessionStorage.setItem('hp_userLocation', JSON.stringify(userLocation));
+        }
+    }, [userLocation]);
 
     // 1️⃣ 위치 가져오기
     useEffect(() => {
-        if (!navigator.geolocation) return; // GPS 미지원 시 즉시 종료
+        // 💡 3. 만약 수동 검색한 기록(예: 나고야역)이 있다면, 내 위치(GPS)로 덮어쓰지 않고 탈출!
+        const savedName = sessionStorage.getItem('hp_locationName');
+        if (savedName && savedName !== "내 주변") {
+            setLoading(false); 
+            return;
+        }
+
+        if (!navigator.geolocation) return; 
 
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -71,7 +120,7 @@ function Hospitals() {
         );
     }, []);
 
-    // 2️⃣ 약국 검색 API
+    // 2️⃣ 병원 검색 API (기존 로직 100% 동일)
     useEffect(() => {
         if (!userLocation) return; 
 
@@ -79,7 +128,8 @@ function Hospitals() {
             setLoading(true);
             try {
                 const placesService = await loadGooglePlacesService();
-                const searchKeyword = isRetry ? '夜間休日急病診療所 救急病院' : '小児科';
+                
+                const searchKeyword = isRetry ? '夜間休日急病診療所 救急病院' : currentContent.keyword;
 
                 const request = {
                     location: userLocation, 
@@ -127,7 +177,7 @@ function Hospitals() {
         };
 
         fetchHospitals();
-    }, [userLocation, isOpenOnly]); 
+    }, [userLocation, isOpenOnly, currentContent.keyword]); 
 
     // 3️⃣ 수동 검색 함수
     const handleManualSearch = async (keyword) => {
@@ -158,7 +208,6 @@ function Hospitals() {
         }
     };
 
-    // 💡 에러 해결 2: window.location.assign() 사용으로 변경
     const openDirections = (hospital) => {
         const encodedName = encodeURIComponent(hospital.nameKr);
         const url = `https://www.google.com/maps/dir/?api=1&destination=${encodedName}&destination_place_id=${hospital.id}`;
@@ -167,7 +216,7 @@ function Hospitals() {
 
     const openFullMap = () => {
         if (!userLocation) return;
-        const query = encodeURIComponent(mode === 'emergency' ? '夜間休日急病診療所 救急病院' : '小児科');
+        const query = encodeURIComponent(mode === 'emergency' ? '夜間休日急病診療所 救急病院' : currentContent.keyword);
         const url = `https://www.google.com/maps/search/${query}/@${userLocation.lat},${userLocation.lng},15z`;
         window.location.assign(url); 
     };
@@ -178,8 +227,9 @@ function Hospitals() {
             
             <div className="container hp-container">
                 
-                {/* 💡 CSS로 깔끔하게 분리된 상단 영역 */}
-                <h2 className="title hp-title hp-page-title">근처 소아과</h2>
+                <h2 className="title hp-title hp-page-title" style={{ color: currentContent.themeColor }}>
+                    {currentContent.title}
+                </h2>
                 
                 <div className="hp-search-wrap">
                     <button 
@@ -189,7 +239,6 @@ function Hospitals() {
                         🔍 다른 지역 검색
                     </button>
                 </div>
-                {/* ------------------------------------- */}
                 
                 <div className="hp-filter-box">
                     <span className="hp-filter-text">🏥 현재 진료 중인 곳만 보기</span>
@@ -198,17 +247,17 @@ function Hospitals() {
                             type="checkbox" 
                             checked={isOpenOnly} 
                             onChange={() => setIsOpenOnly(!isOpenOnly)} 
-                            disabled={locationError} 
+                            disabled={locationError && searchedLocationName === "내 주변"} 
                         />
                         <span className="slider round"></span>
                     </label>
                 </div>
 
                 <p>
-                    <b>[{searchedLocationName}]</b> 에서 가장 가까운 소아과 5곳
+                    <b>[{searchedLocationName}]</b> 에서 가장 가까운 {currentContent.targetName} 5곳
                 </p>
 
-                {locationError ? (
+                {locationError && searchedLocationName === "내 주변" ? (
                     <div className="hp-empty-box">
                         <span className="alert-icon" style={{fontSize: '30px', display: 'block', margin: '0 auto 10px'}}>📍</span>
                         <p className="hp-empty-title" style={{color: '#111827'}}>위치 정보를 가져올 수 없습니다.</p>
@@ -222,14 +271,14 @@ function Hospitals() {
                             새로고침
                         </button>
                     </div>
-                ) : loading || !userLocation ? ( 
+                ) : loading ? ( 
                     <p className="hp-loading-text">
-                        {!userLocation ? '현재 위치를 확인하고 있습니다... 📍' : '주변 소아과를 찾고 있습니다... 🔍'}
+                        {searchedLocationName === "내 주변" && !userLocation ? '현재 위치를 확인하고 있습니다... 📍' : `주변 ${currentContent.targetName}를 찾고 있습니다... 🔍`}
                     </p>
                 ) : hospitals.length === 0 ? (
                     <div className="hp-empty-box">
                         <p className="hp-empty-title">
-                            {isOpenOnly ? "현재 진료 중인 소아과 및 응급센터가 없습니다." : "주변에 검색된 소아과가 없습니다."}
+                            {isOpenOnly ? `현재 진료 중인 ${currentContent.targetName} 및 응급센터가 없습니다.` : `주변에 검색된 ${currentContent.targetName}가 없습니다.`}
                         </p>
                         {isOpenOnly && (
                             <p className="hp-empty-desc">
@@ -245,7 +294,7 @@ function Hospitals() {
                                     <span className="alert-icon hp-emergency-icon">🚨</span>
                                     <div className="hp-emergency-text">
                                         <p className="hp-emergency-title">
-                                            현재 진료 중인 일반 소아과가 없어 <br/>
+                                            현재 진료 중인 일반 {currentContent.targetName}가 없어 <br/>
                                             [야간/휴일 응급센터] 위주로 검색되었습니다.
                                         </p>
                                         <p className="hp-emergency-sub">
