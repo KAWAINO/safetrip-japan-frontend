@@ -56,12 +56,21 @@ function Home() {
                 {/* 1단계: 대상 선택 */}
                 {step === 'start' && (
                     <div className="step-wrapper">
+
+                        <div className="main-title-area">
+                            <img 
+                                src="/images/main-icon.png" 
+                                style={{ width: '30px', height: 'auto' }}
+                                alt="일본 여행 중 아플 때 일본 병원 약국 증상 번역 서비스 -  일본 약국, 병원, 소아과, 산부인과 증상 번역" 
+                            />
+                            <h1>일본 여행 중 아플 때</h1>
+                        </div>
                         <div className="info-card">
-                            <h2>🇯🇵 일본 여행 소통 도우미</h2>
                             <p>
-                                본 서비스는 <strong>의료 행위를 목적으로 하지 않습니다.</strong><br /><br />
-                                일본 내에서 언어 장벽으로 어려움을 겪는 한국인들이 현지 병원이나 약국에서 
-                                <strong> 보다 신속하게 의사소통 서비스를 받을 수 있도록 돕는</strong> 보조 앱입니다.
+                                일본 여행 중 <strong>갑자기 아플 때</strong> 언어의 장벽으로 어려움을 겪고 계신 분들을 위한 앱 입니다.<br/><br/>
+                                내 주변 현지 <strong>약국(드럭스토어)이나 소아과, 산부인과</strong>를 안내받을 수 있습니다.<br/><br/> 
+                                또한, 증상을 선택하면 일본어로 변환되어 <strong>나의 증상을 즉시 설명</strong>할 수 있습니다.<br/><br/>
+                                <span>본 서비스는 의료 행위를 목적으로 하지 않으며, 일본 현지에서 보다 신속하게 서비스를 받을 수 있도록 돕는 보조 앱입니다.</span>
                             </p>
                         </div>
 
