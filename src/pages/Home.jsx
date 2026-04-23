@@ -7,30 +7,33 @@ import './Home.css';
 
 function Home() {
     const navigate = useNavigate();
-    
-    // 💡 단계: start(시작) -> child_age / adult_dest / quick_hospital(신규!)
     const [step, setStep] = useState('start');
-    
-    // 선택한 아이의 연령 정보 저장
     const [childAgeLabel, setChildAgeLabel] = useState('');
     const [childAgeId, setChildAgeId] = useState('');
+    const [tempMonth, setTempMonth] = useState("");
 
     const handleBack = () => {
         if (step === 'child_age') setStep('start');
         else if (step === 'child_dest') setStep('child_age');
         else if (step === 'adult_dest') setStep('start'); 
-        else if (step === 'quick_hospital') setStep('start'); // 💡 빠른 병원 찾기에서 뒤로가기
+        else if (step === 'quick_hospital') setStep('start');
     };
 
+    // 💡 연령 선택 시 처리 (child 통합 대응)
     const handleAgeSelect = (id, label) => {
-        setChildAgeId(id);
-        setChildAgeLabel(label);
+        setChildAgeId(id); // 항상 'child'가 들어옵니다.
+        setChildAgeLabel(label); // '5개월' 또는 '2세 이상'
+        
+        // Result 페이지에서 쓰기 위해 세션에 라벨 저장
+        sessionStorage.setItem("ageLabel_child", label);
+        
         setStep('child_dest'); 
     };
 
+    // 💡 병원 진료 클릭 시 (통합된 child 경로로!)
     const handleHospitalClick = () => {
-        const questionPath = childAgeId === 'under1' ? 'under1' : 'over1';
-        navigate(`/question/${questionPath}`);
+        // 이제 ageId가 'child'로 통합되었으므로 고정 경로로 보냅니다.
+        navigate(`/question/child`);
     };
 
     const handlePharmacyClick = () => {
@@ -42,7 +45,6 @@ function Home() {
         });
     };
 
-    // 임산부 선택 시 문진표 페이지
     const handlePregnantClick = () => {
         navigate('/question/pregnant');
     };
@@ -177,16 +179,61 @@ function Home() {
                     <div className="step-wrapper">
                         <div className="title-area">
                             <h1>아이의 연령을 선택하세요</h1>
-                            <p>정확한 약 처방을 위해 나이 확인이 필요해요.</p>
+                            <p>2세 미만은 개월 수를 선택해주세요.</p>
                         </div>
 
-                        <button className="age-btn" onClick={() => handleAgeSelect('under1', '1세 (12개월) 미만')}>
-                            👶 1세 (12개월) 미만
-                        </button>
-                        <button className="age-btn" onClick={() => handleAgeSelect('1to2', '1세 이상 ~ 2세 미만')}>
-                            🧒 1세 이상 ~ 2세 (24개월) 미만
-                        </button>
-                        <button className="age-btn" onClick={() => handleAgeSelect('over2', '2세 (24개월) 이상')}>
+                        <div className="age-select-container" style={{ 
+                            backgroundColor: '#F3F4F6', padding: '20px', borderRadius: '16px', 
+                            width: '100%', boxSizing: 'border-box'
+                        }}>
+                            <label style={{ display: 'block', fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: '#374151' }}>
+                                👶 2세(24개월) 미만 영유아
+                            </label>
+                            
+                            <select 
+                                className="month-select"
+                                // size="5" <- 이 부분을 삭제하면 클릭해서 펼치는 형태가 됩니다.
+                                onChange={(e) => setTempMonth(e.target.value)}
+                                style={{ 
+                                    width: '100%', 
+                                    padding: '12px', 
+                                    borderRadius: '8px', 
+                                    border: '1px solid #D1D5DB',
+                                    fontSize: '16px', 
+                                    backgroundColor: 'white', 
+                                    marginBottom: '12px', 
+                                    outline: 'none',
+                                    appearance: 'none', // 브라우저 기본 화살표 스타일 유지 (혹은 커스텀)
+                                    backgroundImage: `url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'292.4'%20height%3D'292.4'%3E%3Cpath%20fill%3D'%236B7280'%20d%3D'M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z'%2F%3E%3C%2Fsvg%3E")`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 12px top 50%',
+                                    backgroundSize: '12px auto'
+                                }}
+                            >
+                                <option value="" disabled selected>개월 수 선택</option>
+                                {Array.from({ length: 24 }, (_, i) => (
+                                    <option key={i} value={i}>{i}개월</option>
+                                ))}
+                            </select>
+
+                            <button 
+                                onClick={() => {
+                                    if (tempMonth !== "") handleAgeSelect('child', `${tempMonth}개월`);
+                                    else alert("개월 수를 선택해주세요.");
+                                }}
+                                style={{
+                                    width: '100%', padding: '12px', borderRadius: '8px',
+                                    backgroundColor: tempMonth !== "" ? '#3B82F6' : '#9CA3AF',
+                                    color: 'white', fontWeight: 'bold', border: 'none', cursor: 'pointer'
+                                }}
+                            >
+                                개월 수 확정
+                            </button>
+                        </div>
+
+                        <div style={{ textAlign: 'center', margin: '15px 0', color: '#9CA3AF', fontWeight: 'bold' }}>OR</div>
+
+                        <button className="age-btn" onClick={() => handleAgeSelect('child', '2세 (24개월) 이상')}>
                             👦 2세 (24개월) 이상
                         </button>
                     </div>
@@ -197,9 +244,11 @@ function Home() {
                     <div className="step-wrapper">
                         <div className="title-area">
                             <h1>어디로 가시나요?</h1>
+                            <p>선택한 연령: <strong>{childAgeLabel}</strong></p>
                         </div>
 
-                        {(childAgeId === 'under1' || childAgeId === '1to2') && (
+                        {/* 💡 개월수 기반 주의사항 조건문 수정 */}
+                        {childAgeLabel.includes('개월') && (
                             <div className="disclaimer-box" style={{ marginBottom: '10px', padding: '12px' }}>
                                 <span className="alert-icon">⚠️</span>
                                 <p style={{ fontSize: '12px' }}>

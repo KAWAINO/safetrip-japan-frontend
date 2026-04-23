@@ -47,6 +47,7 @@
 /* 제목 영역 */
 .title-area {
   text-align: center;
+  margin-top: 20px;
   margin-bottom: 10px;
 }
 .main-title-area {

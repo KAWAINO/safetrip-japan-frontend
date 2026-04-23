@@ -1,42 +1,214 @@
 /* src/pages/Result.css */
-.result-card {
-  background: #ffffff;
-  border-radius: 16px;
-  border: 1px solid #e5e5e7;
-  padding: 24px 20px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-  margin-bottom: 24px;
+
+/* 기본 컨테이너 보정 */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: #111827;
+  word-break: keep-all;
+}
+
+/* 1. SOS 아이스브레이킹 메시지 박스 */
+.sos-message-box {
+  background-color: #fffbeb;
+  border: 2px solid #fcd34d;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
   text-align: left;
   width: 100%;
   box-sizing: border-box;
 }
 
+.sos-jp-text {
+  font-size: 16px;
+  font-weight: bold;
+  color: #b45309;
+  margin: 0 0 10px 0;
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.sos-kr-text {
+  font-size: 12px;
+  color: #d97706;
+  margin: 0;
+  line-height: 1.4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* 2. 경고/주의사항 박스 */
+.disclaimer-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background-color: #f9fafb;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.disclaimer-box p {
+  margin: 0;
+  font-size: 11px;
+  color: #6b7280;
+  line-height: 1.4;
+  text-align: left;
+}
+
+/* 3. 메디컬 폼(표 형식) 카드 섹션 */
+.result-card.medical-form {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 2px solid #3b82f6; /* 파란색 강조선 */
+  padding: 0; /* 테이블 밀착을 위해 0 */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
 .result-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  border-bottom: 2px solid #f3f4f6;
-  padding-bottom: 12px;
+  flex-direction: column; /* 가로 배치를 세로 배치로 변경 */
+  align-items: center; /* 가로 기준 가운데 정렬 */
+  justify-content: center;
+  gap: 12px; /* 제목과 버튼 사이의 간격 */
+  padding: 20px 16px; /* 위아래 여백을 살짝 늘려 시원하게 */
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .result-card-title {
   margin: 0;
-  font-size: 18px;
+  font-size: 18px; /* 타이틀을 살짝 더 크게 (선택사항) */
   font-weight: 800;
   color: #111827;
-  border: none;
-  padding: 0;
+  text-align: center; /* 텍스트 가운데 정렬 */
 }
 
+/* 4. 문진표 테이블 구조 */
+.medical-table {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+}
+
+.table-row {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-label {
+  width: 25%;
+  padding: 15px 12px;
+  background-color: #f8fafc;
+  border-right: 1px solid #e5e7eb;
+  font-size: 13px;
+  font-weight: bold;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.table-content {
+  width: 75%;
+  padding: 15px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+/* 환자 정보 강조 */
+.table-content.highlight .jp-main {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+  color: #1d4ed8;
+  text-decoration: underline;
+  margin-bottom: 4px;
+}
+
+.table-content.highlight .kr-sub {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* 증상 리스트 스타일 */
+.medical-result-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.medical-item {
+  margin-bottom: 12px;
+}
+
+.medical-item:last-child {
+  margin-bottom: 0;
+}
+
+.medical-item .jp-text {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.medical-item .kr-text {
+  font-size: 12px;
+  color: #64748b;
+  display: block;
+  margin-top: 2px;
+}
+
+/* 요청 사항 텍스트 */
+.table-content .jp-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #334155;
+  margin: 0;
+}
+
+.table-content .kr-text {
+  font-size: 12px;
+  color: #64748b;
+  margin: 4px 0 0 0;
+}
+
+/* 5. 버튼 및 기타 공통 */
 .copy-btn {
   border: none;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 12px;
+  padding: 8px 20px; /* 버튼을 살짝 더 넓게 */
+  border-radius: 20px; /* 둥근 알약 모양으로 변경 (더 세련됨) */
+  font-size: 13px;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 살짝 그림자 추가 */
 }
 
 .copy-btn.success {
@@ -49,86 +221,24 @@
   color: #374151;
 }
 
-.result-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.btn-area {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
 }
 
-.result-item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.result-item:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.jp-text {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 800;
-  color: #111827;
-  word-break: break-word;
-  line-height: 1.4;
-}
-
-.kr-text {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 500;
-  color: #6b7280;
+.primary-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .empty-text {
-  color: #6b7280;
-  text-align: center;
-  margin-top: 20px;
-}
-
-/* SOS 아이스브레이킹 메시지 박스 */
-/* SOS 아이스브레이킹 메시지 박스 */
-.sos-message-box {
-  background-color: #fffbeb; /* 부드러운 노란색 배경 */
-  border: 2px solid #fcd34d;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
-  text-align: left;
-
-  /* [추가] 박스가 화면 밖으로 나가지 않도록 방어 */
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* SOS 일본어 텍스트 (직원용 메인) */
-.sos-jp-text {
-  font-size: 16px;
-  font-weight: bold;
-  color: #b45309;
-  margin: 0 0 10px 0;
-  line-height: 1.5;
-
-  /* [수정 및 추가] 줄바꿈 최적화 */
-  word-break: keep-all; /* 단어 단위 줄바꿈 (가독성) */
-  overflow-wrap: break-word; /* 긴 문장이 박스를 뚫지 못하게 강제 줄바꿈 */
-}
-
-/* SOS 한국어 텍스트 (부모님 확인용 서브) */
-.sos-kr-text {
-  font-size: 12px;
-  color: #d97706;
-  margin: 0;
-  line-height: 1.4;
-
-  /* [수정 및 추가] 줄바꿈 최적화 */
-  word-break: keep-all; /* 단어 단위 줄바꿈 */
-  overflow-wrap: break-word; /* 박스 끝에서 자동 줄바꿈 */
+  color: #94a3b8;
+  font-size: 14px;
 }

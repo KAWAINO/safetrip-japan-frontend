@@ -1,6 +1,6 @@
 // src/data/questions.js
 export const questions = {
-  under1: [
+  child: [
     {
       id: "fever",
       question: "아이에게 열이 있나요?",
@@ -8,172 +8,115 @@ export const questions = {
       options: [
         { label: "없음", value: "fever_none", jp: "熱はありません。" },
         { label: "모름", value: "fever_unknown", jp: "熱があるか分かりません。" },
-        { label: "37도 이상", value: "fever_37", jp: "37度以上の熱があります。" },
+        { label: "37.5도 ~ 38도", value: "fever_37", jp: "37.5度から38度程度の微熱があります。" },
         { label: "38도 이상", value: "fever_38", jp: "38度以上の熱があります。" },
         { label: "39도 이상", value: "fever_39", jp: "39度以上の熱があります。" }
       ]
     },
     {
-      id: 'fever_onset',
-      type: 'single',
-      question: '열은 언제부터 났나요?',
-      condition: { dependsOn: 'fever', values: ['fever_38', 'fever_39'] }, 
+      id: "appearance",
+      question: "시각적으로 보이는 아이의 상태는 어떤가요?",
+      type: "multi",
       options: [
-        { label: '방금 전부터', value: 'just_now', jp: "つい先ほどから熱が出始めました。" },
-        { label: '오늘 아침부터', value: 'morning', jp: "今朝から熱があります。" },
-        { label: '어젯밤부터', value: 'last_night', jp: "昨晩から熱があります。" },
-        { label: '1~2일 전부터', value: '1_2_days', jp: "1~2日前から熱があります。" }
+        { label: "평소보다 기운이 없어 보임", value: "lethargic", jp: "普段より活気がなく、ぐったりしています。" },
+        { label: "심하게 보채거나 짜증을 부림", value: "irritable", jp: "ひどく機嫌が悪く、ぐずっています。" },
+        { label: "잠만 자려고 함", value: "sleepy", jp: "眠ってばかりいて、なかなか起きません。" },
+        { label: "안색이 창백함", value: "pale", jp: "顔色が青白く、血の気がありません。" },
+        { label: "평소와 비슷함", value: "normal", jp: "見た目の様子は普段と変わりません。" }
       ]
     },
     {
       id: "symptoms",
-      question: "다음 증상이 있나요? (복수 선택 가능)",
+      question: "다음 중 해당되는 증상을 선택해주세요.",
       type: "multi",
       options: [
         { label: "기침", value: "cough", jp: "咳が出ます。" },
         { label: "콧물", value: "runny_nose", jp: "鼻水が出ます。" },
         { label: "구토", value: "vomit", jp: "嘔吐しました。" },
-        { label: "설사", value: "diarrhea", jp: "下痢をしています。" },
+        { label: "경련/경직", value: "seizure", jp: "けいれん（ひきつけ）を起こしました。" }, // 💡 경련 추가
+        { label: "복통(배를 아파함)", value: "stomachache", jp: "お腹を痛がっています。" },
         { label: "발진/두드러기", value: "rash", jp: "発疹・じんましんがあります。" },
         { label: "해당 없음", value: "none", jp: "その他の症状はありません。" }
       ]
     },
-    // 💥 [개편됨] 1. 대변 상태 질문
     {
       id: 'stool_condition',
+      question: '대변의 상태는 어떤가요?',
       type: 'single',
-      question: '대변의 묽기와 상태는 어떤가요?',
       options: [
         { label: '보통 변', value: 'normal', jp: "便の硬さは普通です。" },
-        { label: '묽은 변', value: 'soft', jp: "軟便（やわらかい便）が出ました。" },
-        { label: '설사 / 물설사', value: 'diarrhea', jp: "下痢（水様便）をしています。" },
-        { label: '단단한 변 / 토끼똥', value: 'hard', jp: "硬い便（コロコロ便）が出ました。" },
+        { label: '묽은 변/설사', value: 'soft_diarrhea', jp: "軟便、または下痢をしています。" },
+        { label: '혈변 (피가 섞임)', value: 'bloody_stool', jp: "血便（便に血が混じっている）が出ました。" }, // 💡 혈변 추가
+        { label: '단단한 변/토끼똥', value: 'hard', jp: "硬い便（コロコロ便）が出ました。" },
         { label: '오늘 아직 안 봄', value: 'none', jp: "今日はまだ便が出ていません。" }
       ]
     },
-    // 💥 [개편됨] 2. 대변 색상 질문 (조건부)
-    // src/data/questions.js 내부의 stool_color 질문 수정 (under1, over1 모두 적용)
     {
-      id: 'stool_color',
+      id: 'diaper_urine',
+      question: '소변 상태(기저귀 교체 횟수)는 어떤가요?',
       type: 'single',
-      uiType: 'colorPalette', // 💥 [핵심] 이 질문은 팔레트 UI로 그리라고 프론트에 알려줌
-      question: '대변의 색깔은 어떤가요?',
-      condition: { dependsOn: 'stool_condition', values: ['normal', 'soft', 'diarrhea', 'hard'] },
-      options: [
-        { label: '노란색', value: 'yellow', jp: "便の色は黄色（黄金色）です。", colorCode: '#FBBF24' },
-        { label: '갈색', value: 'brown', jp: "便の色は茶色です。", colorCode: '#78350F' },
-        { label: '녹색', value: 'green', jp: "便の色は緑色です。", colorCode: '#4ADE80' },
-        { label: '빨간색(피)', value: 'red', jp: "赤色の便（血便）が出ました。", colorCode: '#EF4444' },
-        { label: '하얀색/크림', value: 'white', jp: "白色（クリーム色）の便が出ました。", colorCode: '#F9FAFB' },
-        { label: '검은색', value: 'black', jp: "黒色の便が出ました。", colorCode: '#1F2937' }
-      ]
-    },
-    {
-      id: 'diaper',
-      type: 'single',
-      question: '기저귀(소변) 교체 횟수는 평소와 비교해 어떤가요?',
       options: [
         { label: '평소와 비슷함', value: 'normal', jp: "おしっこの回数は普段通りです。" },
-        { label: '평소의 절반 이하로 줄었음', value: 'half', jp: "おしっこの回数が普段の半分以下に減っています。" },
-        { label: '반나절(6시간) 이상 안 봄', value: 'none_6h', jp: "半日（6時間）以上おしっこが出ていません。" }
+        { label: '평소보다 현저히 줄었음', value: 'decreased', jp: "おしっこの回数が明らかに減っています。" },
+        { label: '6시간 이상 소변을 안 봄', value: 'none_6h', jp: "6時間以上おしっこが出ていません。" }
       ]
     },
     {
-      id: "feeding",
-      question: "수유(분유/모유)는 잘 먹나요?",
+      id: "intake",
+      question: "식사나 수유(분유/모유)는 어떤가요?",
       type: "single",
       options: [
-        { label: "평소처럼 먹음", value: "feed_normal", jp: "普段通り飲めています。" },
-        { label: "평소의 절반 이하", value: "feed_half", jp: "普段の半分以下しか飲めません。" },
-        { label: "전혀 못 먹음/토함", value: "feed_none", jp: "全く飲めない、または吐いてしまいます。" }
+        { label: "식사는 평소처럼 잘 먹음", value: "intake_normal", jp: "食事（ミルク）は普段通りとれています。" },
+        { label: "식사는 평소의 절반 이하로 먹음", value: "intake_half", jp: "食事（ミルク）は普段の半分以下しかとれません。" },
+        { label: "식사를 전혀 못 먹음", value: "intake_none", jp: "食事（ミルク）は全くとれません。" }
       ]
-    }
-  ],
-  
-  over1: [
+    },
     {
-      id: "fever",
-      question: "아이에게 열이 있나요?",
+      id: "medication",
+      question: "현재 복용 중인 약이 있나요?",
       type: "single",
       options: [
-        { label: "없음", value: "fever_none", jp: "熱はありません。" },
-        { label: "모름", value: "fever_unknown", jp: "熱があるか分かりません。" },
-        { label: "38도 이상", value: "fever_38", jp: "38度以上の熱があります。" },
-        { label: "39도 이상", value: "fever_39", jp: "39度以上の熱があります。" }
+        { label: "아니오", value: "med_no", jp: "現在服用中の薬はありません。" },
+        { label: "예 (약이나 처방전 지참함)", value: "med_yes", jp: "現在服用中の薬があります（実物または処方箋を持参しています）。" }
       ]
     },
     {
-      id: 'fever_onset',
-      type: 'single',
-      question: '열은 언제부터 났나요?',
-      condition: { dependsOn: 'fever', values: ['fever_38', 'fever_39'] }, 
-      options: [
-        { label: '방금 전부터', value: 'just_now', jp: "つい先ほどから熱が出始めました。" },
-        { label: '오늘 아침부터', value: 'morning', jp: "今朝から熱があります。" },
-        { label: '어젯밤부터', value: 'last_night', jp: "昨晩から熱があります。" },
-        { label: '1~2일 전부터', value: '1_2_days', jp: "1~2日前から熱があります。" }
-      ]
-    },
-    {
-      id: "symptoms",
-      question: "다음 증상이 있나요? (복수 선택 가능)",
-      type: "multi",
-      options: [
-        { label: "기침", value: "cough", jp: "咳が出ます。" },
-        { label: "콧물", value: "runny_nose", jp: "鼻水が出ます。" },
-        { label: "구토", value: "vomit", jp: "嘔吐しました。" },
-        // { label: "설사", value: "diarrhea", jp: "下痢をしています。" },
-        { label: "복통", value: "stomachache", jp: "お腹を痛がっています。" },
-        { label: "발진/두드러기", value: "rash", jp: "発疹・じんましんがあります。" },
-        { label: "해당 없음", value: "none", jp: "その他の症状はありません。" }
-      ]
-    },
-    // 💥 [개편됨] 1. 대변 상태 질문
-    {
-      id: 'stool_condition',
-      type: 'single',
-      question: '대변의 묽기와 상태는 어떤가요?',
-      options: [
-        { label: '보통 변', value: 'normal', jp: "便の硬さは普通です。" },
-        { label: '묽은 변', value: 'soft', jp: "軟便（やわらかい便）が出ました。" },
-        { label: '설사 / 물설사', value: 'diarrhea', jp: "下痢（水様便）をしています。" },
-        { label: '단단한 변 / 토끼똥', value: 'hard', jp: "硬い便（コロコロ便）が出ました。" },
-        { label: '오늘 아직 안 봄', value: 'none', jp: "今日はまだ便が出ていません。" }
-      ]
-    },
-    // 💥 [개편됨] 2. 대변 색상 질문 (조건부)
-    {
-      id: 'stool_color',
-      type: 'single',
-      question: '대변의 색깔은 어떤가요?',
-      condition: { dependsOn: 'stool_condition', values: ['normal', 'soft', 'diarrhea', 'hard'] },
-      options: [
-        { label: '🟡 노란색 / 황금색', value: 'yellow', jp: "便の色は黄色（黄金色）です。" },
-        { label: '🟤 갈색 / 진갈색', value: 'brown', jp: "便の色は茶色です。" },
-        { label: '🟢 녹색', value: 'green', jp: "便の色は緑色です。" },
-        { label: '🔴 빨간색 (피 섞임)', value: 'red', jp: "赤色の便（血便）が出ました。" },
-        { label: '⚪ 하얀색 / 크림색', value: 'white', jp: "白色（クリーム色）の便が出ました。" },
-        { label: '⚫ 검은색 (짜장면색)', value: 'black', jp: "黒色の便が出ました。" }
-      ]
-    },
-    {
-      id: 'diaper',
-      type: 'single',
-      question: '기저귀(소변) 교체 횟수는 평소와 비교해 어떤가요?',
-      options: [
-        { label: '평소와 비슷함', value: 'normal', jp: "おしっこの回数は普段通りです。" },
-        { label: '평소의 절반 이하로 줄었음', value: 'half', jp: "おしっこの回数が普段の半分以下に減っています。" },
-        { label: '반나절(6시간) 이상 안 봄', value: 'none_6h', jp: "半日（6時間）以上おしっこが出ていません。" }
-      ]
-    },
-    {
-      id: "eating",
-      question: "식사나 수분 섭취는 어떤가요?",
+      id: "allergy",
+      question: "약이나 음식물 알레르기가 있나요?",
       type: "single",
       options: [
-        { label: "평소와 비슷함", value: "eat_normal", jp: "普段通り食べられています。" },
-        { label: "물만 조금 마심", value: "eat_water_only", jp: "水分しか摂れません。" },
-        { label: "전혀 못 먹음", value: "eat_none", jp: "全く食べられず、水分も摂れません。" }
+        { label: "아니오", value: "alg_no", jp: "薬や食べ物のアレルギーはありません。" },
+        { label: "약 알레르기 있음", value: "alg_med", jp: "薬のアレルギーがあります。" },
+        { label: "음식 알레르기 있음 (계란, 우유 등)", value: "alg_food", jp: "食べ物（卵、牛乳など）のアレルギーがあります。" }
+      ]
+    },
+    {
+      id: "past_illness",
+      question: "과거에 앓았거나 현재 있는 지병이 있나요? (복수 선택 가능)",
+      type: "multi", 
+      options: [
+        { label: "천식", value: "asthma", jp: "ぜんそく（喘息）の病歴があります。" },
+        { label: "열성경련", value: "febrile_seizure", jp: "熱性けいれんの病歴があります。" },
+        { label: "가와사키병", value: "kawasaki", jp: "川崎病の病歴があります。" },
+        { label: "수두", value: "chickenpox", jp: "水ぼうそう（水痘）の病歴があります。" },
+        { label: "홍역", value: "measles", jp: "はしか（麻疹）の病歴があります。" },
+        { label: "풍진", value: "rubella", jp: "風疹（ふうしん）の病歴があります。" },
+        { label: "볼거리", value: "mumps", jp: "おたふくかぜ（流行性耳下腺炎）の病歴があります。" },
+        { label: "백일해", value: "pertussis", jp: "百日咳（ひゃくにちぜき）の病歴があります。" },
+        { label: "일본뇌염", value: "japanese_encephalitis", jp: "日本脳炎の病歴があります。" },
+        { label: "해당 없음", value: "none", jp: "特にかかった大きな病気（既往歴）はありません。" }
+      ]
+    },
+    {
+      id: "onset_time",
+      question: "이러한 증상은 언제부터 시작되었나요?",
+      type: "single",
+      options: [
+        { label: "방금 전부터", value: "just_now", jp: "つい先ほどからです。" },
+        { label: "오늘 아침/오전부터", value: "morning", jp: "今朝（午前中）からです。" },
+        { label: "어젯밤부터", value: "last_night", jp: "昨晩からです。" },
+        { label: "1~2일 전부터", value: "1_2_days", jp: "1〜2日前からです。" },
+        { label: "3일 이상 됨", value: "over_3days", jp: "3日以上前から続いています。" }
       ]
     }
   ],
