@@ -46,16 +46,15 @@ function Result() {
         return ageInfoMap[resultData.ageId] || { kr: '기타', jp: 'その他' };
     }, [resultData]);
 
-    // 💡 데이터를 7가지 그룹으로 정밀 분류 (신규 3종 추가)
     const categorizedResults = useMemo(() => {
         const groups = {
-            onsetTime: [],   // 증상 시작 (onset_time)
-            appearance: [],  // 환자 상태 (appearance, intake)
-            main: [],        // 주요 증상 (symptoms, fever 등 나머지)
-            excretory: [],   // 소변/대변 (stool, urine, diaper)
-            medication: [],  // 복용중인 약 (medication)
-            allergy: [],     // 알레르기 (allergy)
-            pastIllness: []  // 병력 (past_illness)
+            onsetTime: [],
+            appearance: [], 
+            main: [],       
+            excretory: [],  
+            medication: [], 
+            allergy: [],    
+            pastIllness: [] 
         };
 
         if (!resultData || !questions[resultData.ageId]) return groups;
@@ -67,9 +66,12 @@ function Result() {
             const answerVal = answers[q.id];
             if (!answerVal || (Array.isArray(answerVal) && answerVal.length === 0)) return;
 
-            // 그룹 판단 로직
             let targetGroup;
-            if (q.id === 'onset_time') targetGroup = groups.onsetTime;
+            // 💡 임산부 데이터 매핑 추가
+            if (q.id === 'preg_weeks') targetGroup = groups.appearance; // 임신 주수는 상태/시기 느낌으로
+            else if (q.id === 'preg_symptom') targetGroup = groups.main; // 불편 증상은 메인으로
+            // 소아 데이터 매핑
+            else if (q.id === 'onset_time') targetGroup = groups.onsetTime;
             else if (q.id === 'appearance' || q.id === 'intake') targetGroup = groups.appearance;
             else if (q.id.startsWith('stool') || q.id.startsWith('urine') || q.id.startsWith('diaper')) targetGroup = groups.excretory;
             else if (q.id === 'medication') targetGroup = groups.medication;
@@ -94,19 +96,32 @@ function Result() {
         navigate("/");
     };
 
-    // 💡 클립보드 복사 기능 (신규 3종 추가)
+    const isPregnant = resultData?.ageId === 'pregnant';
+
+    // 💡 클립보드 복사 텍스트도 분기 처리
     const handleCopy = async () => {
-        const fullText = [
-            `[患者年齢 / 환자 연령: ${currentAge?.jp}]`,
-            categorizedResults.onsetTime.length > 0 ? `[発症時期 / 증상 시작: ${categorizedResults.onsetTime.map(i => i.jp).join(', ')}]` : '',
-            `[症状のまとめ / 증상 요약]\n${categorizedResults.main.map(i => `• ${i.jp}`).join('\n')}`,
-            categorizedResults.appearance.length > 0 ? `[患者の状態 / 환자 상태]\n${categorizedResults.appearance.map(i => `• ${i.jp}`).join('\n')}` : '',
-            categorizedResults.excretory.length > 0 ? `[排泄状態 / 배설 상태]\n${categorizedResults.excretory.map(i => `• ${i.jp}`).join('\n')}` : '',
-            categorizedResults.medication.length > 0 ? `[服用中の薬 / 복용중인 약]\n${categorizedResults.medication.map(i => `• ${i.jp}`).join('\n')}` : '',
-            categorizedResults.allergy.length > 0 ? `[アレルギー / 알레르기]\n${categorizedResults.allergy.map(i => `• ${i.jp}`).join('\n')}` : '',
-            categorizedResults.pastIllness.length > 0 ? `[既往歴 / 병력]\n${categorizedResults.pastIllness.map(i => `• ${i.jp}`).join('\n')}` : '',
-            `\n診察と処方をお願いします。 (진찰과 처방을 부탁드립니다.)`
-        ].filter(Boolean).join('\n');
+        let fullText = "";
+
+        if (isPregnant) {
+            fullText = [
+                `[患者状態 / 환자 상태: ${currentAge?.jp}]`,
+                categorizedResults.appearance.length > 0 ? `[妊娠週数 / 임신 주차]\n${categorizedResults.appearance.map(i => `• ${i.jp}`).join('\n')}` : '',
+                `[主な症状 / 주요 증상]\n${categorizedResults.main.map(i => `• ${i.jp}`).join('\n')}`,
+                `\n診察と処方をお願いします。 (진찰과 처방을 부탁드립니다.)`
+            ].filter(Boolean).join('\n');
+        } else {
+            fullText = [
+                `[患者年齢 / 환자 연령: ${currentAge?.jp}]`,
+                categorizedResults.onsetTime.length > 0 ? `[発症時期 / 증상 시작: ${categorizedResults.onsetTime.map(i => i.jp).join(', ')}]` : '',
+                `[症状のまとめ / 증상 요약]\n${categorizedResults.main.map(i => `• ${i.jp}`).join('\n')}`,
+                categorizedResults.appearance.length > 0 ? `[患者の状態 / 환자 상태]\n${categorizedResults.appearance.map(i => `• ${i.jp}`).join('\n')}` : '',
+                categorizedResults.excretory.length > 0 ? `[排泄状態 / 배설 상태]\n${categorizedResults.excretory.map(i => `• ${i.jp}`).join('\n')}` : '',
+                categorizedResults.medication.length > 0 ? `[服用中の薬 / 복용중인 약]\n${categorizedResults.medication.map(i => `• ${i.jp}`).join('\n')}` : '',
+                categorizedResults.allergy.length > 0 ? `[アレルギー / 알레르기]\n${categorizedResults.allergy.map(i => `• ${i.jp}`).join('\n')}` : '',
+                categorizedResults.pastIllness.length > 0 ? `[既往歴 / 병력]\n${categorizedResults.pastIllness.map(i => `• ${i.jp}`).join('\n')}` : '',
+                `\n診察と処方をお願いします。 (진찰과 처방을 부탁드립니다.)`
+            ].filter(Boolean).join('\n');
+        }
 
         try {
             if (navigator.clipboard && window.isSecureContext) {
@@ -127,7 +142,6 @@ function Result() {
     };
 
     if (!resultData) return null;
-    const isPregnant = resultData.ageId === 'pregnant';
 
     return (
         <div className="container">
@@ -146,7 +160,7 @@ function Result() {
 
             <div className="disclaimer-box">
                 <span className="alert-icon">⚠️</span>
-                <p>본 번역은 소통 보조용이며, 의학적 진단을 대체하지 않습니다.<br />
+                <p>본 번역은 소통 보조용이며, 의학적 진단을 대체하지 않습니다。<br />
                     (この翻訳はコミュニケーション補助用이며, 医学的診断に代わるものではありません。)</p>
             </div>
 
@@ -159,114 +173,144 @@ function Result() {
                 </div>
 
                 <div className="medical-table">
-                    {/* 1. 환자 연령 */}
-                    <div className="table-row">
-                        <div className="table-label">환자 연령<br/>(患者年齢)</div>
-                        <div className="table-content highlight">
-                            <span className="jp-main">{currentAge?.jp}</span>
-                            <span className="kr-sub">({currentAge?.kr})</span>
-                        </div>
-                    </div>
-
-                    {/* 2. 증상 시작 */}
-                    {categorizedResults.onsetTime.length > 0 && (
-                        <div className="table-row">
-                            <div className="table-label">증상 시작<br/>(発症時期)</div>
-                            <div className="table-content">
-                                {categorizedResults.onsetTime.map((item, i) => (
-                                    <div key={i}><span className="jp-text">{item.jp}</span><br/><span className="kr-text">({item.kr})</span></div>
-                                ))}
+                    {/* 💡 임산부용 렌더링 */}
+                    {isPregnant ? (
+                        <>
+                            <div className="table-row">
+                                <div className="table-label">환자 상태<br/>(患者状態)</div>
+                                <div className="table-content highlight">
+                                    <span className="jp-main">{currentAge?.jp}</span>
+                                    <span className="kr-sub">({currentAge?.kr})</span>
+                                </div>
                             </div>
-                        </div>
-                    )}
-
-                    {/* 3. 환자 상태 */}
-                    {categorizedResults.appearance.length > 0 && (
-                        <div className="table-row">
-                            <div className="table-label">환자 상태<br/>(患者状態)</div>
-                            <div className="table-content">
-                                <ul className="medical-result-list">
-                                    {categorizedResults.appearance.map((item, i) => (
-                                        <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* 4. 주요 증상 */}
-                    <div className="table-row">
-                        <div className="table-label">주요 증상<br/>(主な症状)</div>
-                        <div className="table-content">
-                            {categorizedResults.main.length === 0 ? (
-                                <p className="empty-text">선택된 증상이 없습니다.</p>
-                            ) : (
-                                <ul className="medical-result-list">
-                                    {categorizedResults.main.map((item, i) => (
-                                        <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
-                                    ))}
-                                </ul>
+                            
+                            {categorizedResults.appearance.length > 0 && (
+                                <div className="table-row">
+                                    <div className="table-label">임신 주차<br/>(妊娠週数)</div>
+                                    <div className="table-content">
+                                        {categorizedResults.appearance.map((item, i) => (
+                                            <div key={i}><span className="jp-text">{item.jp}</span><br/><span className="kr-text">({item.kr})</span></div>
+                                        ))}
+                                    </div>
+                                </div>
                             )}
-                        </div>
-                    </div>
 
-                    {/* 5. 소변/대변 */}
-                    {categorizedResults.excretory.length > 0 && (
-                        <div className="table-row">
-                            <div className="table-label">소변/대변<br/>(排泄状態)</div>
-                            <div className="table-content">
-                                <ul className="medical-result-list">
-                                    {categorizedResults.excretory.map((item, i) => (
-                                        <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
-                                    ))}
-                                </ul>
+                            <div className="table-row">
+                                <div className="table-label">주요 증상<br/>(主な症状)</div>
+                                <div className="table-content">
+                                    <ul className="medical-result-list">
+                                        {categorizedResults.main.map((item, i) => (
+                                            <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
+                                        ))}
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
+                        </>
+                    ) : (
+                        /* 💡 소아용 렌더링 (기존과 완벽히 동일) */
+                        <>
+                            <div className="table-row">
+                                <div className="table-label">환자 연령<br/>(患者年齢)</div>
+                                <div className="table-content highlight">
+                                    <span className="jp-main">{currentAge?.jp}</span>
+                                    <span className="kr-sub">({currentAge?.kr})</span>
+                                </div>
+                            </div>
+
+                            {categorizedResults.onsetTime.length > 0 && (
+                                <div className="table-row">
+                                    <div className="table-label">증상 시작<br/>(発症時期)</div>
+                                    <div className="table-content">
+                                        {categorizedResults.onsetTime.map((item, i) => (
+                                            <div key={i}><span className="jp-text">{item.jp}</span><br/><span className="kr-text">({item.kr})</span></div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {categorizedResults.appearance.length > 0 && (
+                                <div className="table-row">
+                                    <div className="table-label">환자 상태<br/>(患者状態)</div>
+                                    <div className="table-content">
+                                        <ul className="medical-result-list">
+                                            {categorizedResults.appearance.map((item, i) => (
+                                                <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="table-row">
+                                <div className="table-label">주요 증상<br/>(主な症状)</div>
+                                <div className="table-content">
+                                    {categorizedResults.main.length === 0 ? (
+                                        <p className="empty-text">선택된 증상이 없습니다.</p>
+                                    ) : (
+                                        <ul className="medical-result-list">
+                                            {categorizedResults.main.map((item, i) => (
+                                                <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            </div>
+
+                            {categorizedResults.excretory.length > 0 && (
+                                <div className="table-row">
+                                    <div className="table-label">소변/대변<br/>(排泄状態)</div>
+                                    <div className="table-content">
+                                        <ul className="medical-result-list">
+                                            {categorizedResults.excretory.map((item, i) => (
+                                                <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
+
+                            {categorizedResults.medication.length > 0 && (
+                                <div className="table-row">
+                                    <div className="table-label">복용중인 약<br/>(服用中の薬)</div>
+                                    <div className="table-content">
+                                        <ul className="medical-result-list">
+                                            {categorizedResults.medication.map((item, i) => (
+                                                <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
+
+                            {categorizedResults.allergy.length > 0 && (
+                                <div className="table-row">
+                                    <div className="table-label">알레르기<br/>(アレルギー)</div>
+                                    <div className="table-content">
+                                        <ul className="medical-result-list">
+                                            {categorizedResults.allergy.map((item, i) => (
+                                                <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
+
+                            {categorizedResults.pastIllness.length > 0 && (
+                                <div className="table-row">
+                                    <div className="table-label">병력<br/>(既往歴)</div>
+                                    <div className="table-content">
+                                        <ul className="medical-result-list">
+                                            {categorizedResults.pastIllness.map((item, i) => (
+                                                <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     )}
 
-                    {/* 💡 6. 복용중인 약 */}
-                    {categorizedResults.medication.length > 0 && (
-                        <div className="table-row">
-                            <div className="table-label">복용중인 약<br/>(服用中の薬)</div>
-                            <div className="table-content">
-                                <ul className="medical-result-list">
-                                    {categorizedResults.medication.map((item, i) => (
-                                        <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* 💡 7. 알레르기 */}
-                    {categorizedResults.allergy.length > 0 && (
-                        <div className="table-row">
-                            <div className="table-label">알레르기<br/>(アレルギー)</div>
-                            <div className="table-content">
-                                <ul className="medical-result-list">
-                                    {categorizedResults.allergy.map((item, i) => (
-                                        <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* 💡 8. 병력 */}
-                    {categorizedResults.pastIllness.length > 0 && (
-                        <div className="table-row">
-                            <div className="table-label">병력<br/>(既往歴)</div>
-                            <div className="table-content">
-                                <ul className="medical-result-list">
-                                    {categorizedResults.pastIllness.map((item, i) => (
-                                        <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* 9. 요청 사항 */}
+                    {/* 공통: 요청 사항 */}
                     <div className="table-row">
                         <div className="table-label">요청 사항<br/>(備考)</div>
                         <div className="table-content">
