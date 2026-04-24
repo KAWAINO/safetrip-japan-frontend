@@ -5,7 +5,7 @@ import { questions } from "../data/questions";
 import './Result.css';
 
 const ageInfoMap = {
-    'pregnant': { kr: '임산부 (태교 여행)', jp: '妊婦（妊娠中）' }
+    'pregnant': { kr: '임산부 (태교 여행)', jp: '妊婦（妊娠중）' }
 };
 
 function Result() {
@@ -67,10 +67,8 @@ function Result() {
             if (!answerVal || (Array.isArray(answerVal) && answerVal.length === 0)) return;
 
             let targetGroup;
-            // 💡 임산부 데이터 매핑 추가
-            if (q.id === 'preg_weeks') targetGroup = groups.appearance; // 임신 주수는 상태/시기 느낌으로
-            else if (q.id === 'preg_symptom') targetGroup = groups.main; // 불편 증상은 메인으로
-            // 소아 데이터 매핑
+            if (q.id === 'preg_weeks') targetGroup = groups.appearance; 
+            else if (q.id === 'preg_symptom') targetGroup = groups.main; 
             else if (q.id === 'onset_time') targetGroup = groups.onsetTime;
             else if (q.id === 'appearance' || q.id === 'intake') targetGroup = groups.appearance;
             else if (q.id.startsWith('stool') || q.id.startsWith('urine') || q.id.startsWith('diaper')) targetGroup = groups.excretory;
@@ -98,7 +96,6 @@ function Result() {
 
     const isPregnant = resultData?.ageId === 'pregnant';
 
-    // 💡 클립보드 복사 텍스트도 분기 처리
     const handleCopy = async () => {
         let fullText = "";
 
@@ -119,7 +116,7 @@ function Result() {
                 categorizedResults.medication.length > 0 ? `[服用中の薬 / 복용중인 약]\n${categorizedResults.medication.map(i => `• ${i.jp}`).join('\n')}` : '',
                 categorizedResults.allergy.length > 0 ? `[アレルギー / 알레르기]\n${categorizedResults.allergy.map(i => `• ${i.jp}`).join('\n')}` : '',
                 categorizedResults.pastIllness.length > 0 ? `[既往歴 / 병력]\n${categorizedResults.pastIllness.map(i => `• ${i.jp}`).join('\n')}` : '',
-                `\n診察と処方をお願いします。 (진찰과 처방을 부탁드립니다.)`
+                `\n診察과 처방을 부탁드립니다. (診察と処方をお願いします。)`
             ].filter(Boolean).join('\n');
         }
 
@@ -149,8 +146,8 @@ function Result() {
 
             <div className="sos-message-box">
                 <p className="sos-jp-text">
-                    日本を旅行中の韓国人です。<br />日本語はよく話せません。<br />
-                    {isPregnant ? "妊娠中の状態と症状は以下の通りです。\n診察が必要です。" : "年齢と症状は以下の通りです。\n診察が必要です。"}
+                    日本を旅行中の韓国인입니다.<br />日本語는 잘 못합니다.<br />
+                    {isPregnant ? "妊娠 중인 상태와 증상은 아래와 같습니다. 診察이 필요합니다." : "연령과 증상은 아래와 같습니다. 診察이 필요합니다."}
                 </p>
                 <p className="sos-kr-text">
                     (일본을 여행 중인 한국인 입니다. 일본어를 잘 모릅니다. <br/>
@@ -160,7 +157,7 @@ function Result() {
 
             <div className="disclaimer-box">
                 <span className="alert-icon">⚠️</span>
-                <p>본 번역은 소통 보조용이며, 의학적 진단을 대체하지 않습니다。<br />
+                <p>본 번역은 소통 보조용이며, 의학적 진단을 대체하지 않습니다.<br />
                     (この翻訳はコミュニケーション補助用이며, 医学的診断に代わるものではありません。)</p>
             </div>
 
@@ -173,7 +170,6 @@ function Result() {
                 </div>
 
                 <div className="medical-table">
-                    {/* 💡 임산부용 렌더링 */}
                     {isPregnant ? (
                         <>
                             <div className="table-row">
@@ -207,7 +203,6 @@ function Result() {
                             </div>
                         </>
                     ) : (
-                        /* 💡 소아용 렌더링 (기존과 완벽히 동일) */
                         <>
                             <div className="table-row">
                                 <div className="table-label">환자 연령<br/>(患者年齢)</div>
@@ -275,7 +270,7 @@ function Result() {
                                     <div className="table-content">
                                         <ul className="medical-result-list">
                                             {categorizedResults.medication.map((item, i) => (
-                                                <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
+                                                <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-sub">({item.kr})</span></li>
                                             ))}
                                         </ul>
                                     </div>
@@ -310,7 +305,6 @@ function Result() {
                         </>
                     )}
 
-                    {/* 공통: 요청 사항 */}
                     <div className="table-row">
                         <div className="table-label">요청 사항<br/>(備考)</div>
                         <div className="table-content">
@@ -321,11 +315,100 @@ function Result() {
                 </div>
             </div>
 
+            {/* 💡 핵심 기능 영역 */}
             <div className="btn-area">
                 <button className="primary-btn location-btn" style={{ backgroundColor: isPregnant ? '#DB2777' : '#3B82F6' }} onClick={() => navigate('/hospitals', { state: { category: isPregnant ? 'obgyn' : 'pediatrics' } })}>📍 {isPregnant ? '근처 산부인과 찾기' : '내 주변 병원 찾기'}</button>
                 {!isPregnant && <button className="primary-btn location-btn" style={{ backgroundColor: '#10B981', marginBottom: '12px' }} onClick={() => navigate('/pharmacies')}>💊 근처 약국 / 드럭스토어 찾기</button>}
+                
                 <button className="primary-btn" style={{ backgroundColor: '#00C73C', color: 'white', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }} onClick={() => window.open('https://papago.naver.com/?sk=ko&tk=ja', '_blank')}><img src="/images/papago-icon.png" alt="파파고" style={{ width: '20px', height: '20px', borderRadius: '4px', backgroundColor: 'white', padding: '2px' }} />파파고 실시간 번역기 열기</button>
-                <button className="primary-btn" style={{ backgroundColor: "#E5E7EB", color: "#4B5563" }} onClick={handleGoHome}>🏠 처음으로 돌아가기</button>
+                <button className="primary-btn" style={{ backgroundColor: "#E5E7EB", color: "#4B5563", marginBottom: '32px' }} onClick={handleGoHome}>🏠 처음으로 돌아가기</button>
+
+                {/* 💡 외부 지원/정부 서비스 그룹 (새로 추가된 섹션) */}
+                <div style={{ padding: '10px 16px 20px 16px', backgroundColor: '#F9FAFB', borderRadius: '12px', border: '1px solid #E5E7EB' }}>
+                    <h4 style={{ fontSize: '16px', fontWeight: '800', color: '#374151', marginBottom: '14px', textAlign: 'center' }}>
+                        🆘 도움이 더 필요하신가요?
+                    </h4>
+
+                    {/* 1. JNTO 긴급 가이드 및 24시간 콜센터 */}
+                    <button 
+                        className="primary-btn" 
+                        style={{ 
+                            backgroundColor: '#FEFCE8', // 연한 노란색
+                            border: '1px solid #FDE047', // 노란색 테두리
+                            color: '#854D0E', // 진한 갈색/노란색 텍스트
+                            marginBottom: '10px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '4px',
+                            padding: '12px',
+                            cursor: 'pointer',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                        }} 
+                        onClick={() => window.open('https://www.jnto.go.jp/emergency/kor/mi_guide.html', '_blank')}
+                    >
+                        <span style={{ fontSize: '14px', fontWeight: '700' }}>
+                            📞 일본 병원 검색 및 통역 지원이 필요하다면?
+                        </span>
+                        <span style={{ fontSize: '12px', fontWeight: '500', color: '#6B7280', textAlign: 'center', wordBreak: 'keep-all' }}>
+                            일본관광청(JNTO) 공식 긴급 의료 가이드 & 24시간 콜센터
+                        </span>
+                    </button>
+
+                    {/* 2. 후생노동성 의료정보넷 (Navii) */}
+                    <button 
+                        className="primary-btn" 
+                        style={{ 
+                            backgroundColor: '#EFF6FF', // 연한 파란색
+                            border: '1px solid #93C5FD', // 파란색 테두리
+                            color: '#1E3A8A', // 진한 파란색 텍스트
+                            marginBottom: '10px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '4px',
+                            padding: '12px',
+                            cursor: 'pointer',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                        }} 
+                        // 💡 pref=13(도쿄)를 빼고 전국 검색 가능한 메인 페이지로 연결
+                        onClick={() => window.open('https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2300/initialize', '_blank')}
+                    >
+                        <span style={{ fontSize: '14px', fontWeight: '700' }}>
+                            🏥 외국어 지원 종합 병원을 찾고 싶다면?
+                        </span>
+                        <span style={{ fontSize: '12px', fontWeight: '500', color: '#6B7280', textAlign: 'center', wordBreak: 'keep-all' }}>
+                            일본 후생노동성 공식 지정 의료정보넷 (Navii)
+                        </span>
+                    </button>
+
+                    {/* 3. 도쿄해상일동 여행자 보험 */}
+                    <button 
+                        className="primary-btn" 
+                        style={{ 
+                            backgroundColor: '#F0FDF4', 
+                            border: '1px solid #6EE7B7', 
+                            color: '#065F46', 
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '4px',
+                            padding: '12px',
+                            cursor: 'pointer'
+                        }} 
+                        onClick={() => window.open('http://t-o.tmnf.jp/t/13190090T9021000000000000UNYUHUKUSENKAI', '_blank')}
+                    >
+                        <span style={{ fontSize: '14px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            🛡️ 일본 입국 전 보험에 가입하지 않았다면?
+                        </span>
+                        <span style={{ fontSize: '12px', fontWeight: '600', color: '#047857', textAlign: 'center', wordBreak: 'keep-all' }}>
+                            입국 후 가입 가능한 외국인 보험 (도쿄해상일동)
+                        </span>
+                    </button>
+                </div>
             </div>
         </div>
     );
