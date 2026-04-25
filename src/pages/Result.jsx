@@ -146,8 +146,8 @@ function Result() {
 
             <div className="sos-message-box">
                 <p className="sos-jp-text">
-                    日本を旅行中の韓国인입니다.<br />日本語는 잘 못합니다.<br />
-                    {isPregnant ? "妊娠 중인 상태와 증상은 아래와 같습니다. 診察이 필요합니다." : "연령과 증상은 아래와 같습니다. 診察이 필요합니다."}
+                    日本を旅行中の韓国人です。<br />日本語はよく話せません。<br />
+                    {isPregnant ? "妊娠中の状態と症状は以下の通りです。診察が必要です。" : "年齢と症状は以下の通りです。診察が必要です。"}
                 </p>
                 <p className="sos-kr-text">
                     (일본을 여행 중인 한국인 입니다. 일본어를 잘 모릅니다. <br/>
