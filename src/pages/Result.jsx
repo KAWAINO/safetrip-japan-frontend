@@ -12,6 +12,9 @@ function Result() {
     const location = useLocation();
     const navigate = useNavigate();
     const [isCopied, setIsCopied] = useState(false);
+    
+    // 💡 신규 추가: 문진표 펼치기/접기 상태 관리 (초기값: false로 접어둠)
+    const [isQuestionnaireOpen, setIsQuestionnaireOpen] = useState(false);
 
     const [resultData, setResultData] = useState(() => {
         if (location.state && location.state.ageId && location.state.answers) {
@@ -48,13 +51,7 @@ function Result() {
 
     const categorizedResults = useMemo(() => {
         const groups = {
-            onsetTime: [],
-            appearance: [], 
-            main: [],       
-            excretory: [],  
-            medication: [], 
-            allergy: [],    
-            pastIllness: [] 
+            onsetTime: [], appearance: [], main: [], excretory: [], medication: [], allergy: [], pastIllness: [] 
         };
 
         if (!resultData || !questions[resultData.ageId]) return groups;
@@ -158,164 +155,197 @@ function Result() {
             <div className="disclaimer-box">
                 <span className="alert-icon">⚠️</span>
                 <p>본 번역은 소통 보조용이며, 의학적 진단을 대체하지 않습니다.<br />
-                    (この翻訳はコミュニケーション補助用이며, 医学的診断に代わるものではありません。)</p>
+                    (この翻訳はコミュニケーション補助用であり、医学的診断に代わるものではありません。)</p>
             </div>
 
+            {/* 💡 핵심: 문진표 아코디언 영역 */}
             <div className="result-card medical-form">
-                <div className="result-header">
-                    <h3 className="result-card-title">Medical Questionnaire (問診票)</h3>
-                    <button onClick={handleCopy} className={`copy-btn ${isCopied ? 'success' : 'default'}`}>
-                        {isCopied ? "✓ 복사 완료" : "📋 텍스트 복사"}
+                {!isQuestionnaireOpen ? (
+                    // 닫혀있을 때 보여줄 버튼
+                    <button 
+                        onClick={() => setIsQuestionnaireOpen(true)}
+                        style={{
+                            width: '100%', padding: '16px', backgroundColor: '#FFFFFF', 
+                            border: '2px solid #3B82F6', borderRadius: '12px', color: '#1D4ED8', 
+                            fontSize: '16px', fontWeight: '800', cursor: 'pointer',
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                        }}
+                    >
+                        <span>📋 완성된 증상 문진표 보기</span>
+                        <span>▼</span>
                     </button>
-                </div>
-
-                <div className="medical-table">
-                    {isPregnant ? (
-                        <>
-                            <div className="table-row">
-                                <div className="table-label">환자 상태<br/>(患者状態)</div>
-                                <div className="table-content highlight">
-                                    <span className="jp-main">{currentAge?.jp}</span>
-                                    <span className="kr-sub">({currentAge?.kr})</span>
-                                </div>
-                            </div>
-                            
-                            {categorizedResults.appearance.length > 0 && (
-                                <div className="table-row">
-                                    <div className="table-label">임신 주차<br/>(妊娠週数)</div>
-                                    <div className="table-content">
-                                        {categorizedResults.appearance.map((item, i) => (
-                                            <div key={i}><span className="jp-text">{item.jp}</span><br/><span className="kr-text">({item.kr})</span></div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="table-row">
-                                <div className="table-label">주요 증상<br/>(主な症状)</div>
-                                <div className="table-content">
-                                    <ul className="medical-result-list">
-                                        {categorizedResults.main.map((item, i) => (
-                                            <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="table-row">
-                                <div className="table-label">환자 연령<br/>(患者年齢)</div>
-                                <div className="table-content highlight">
-                                    <span className="jp-main">{currentAge?.jp}</span>
-                                    <span className="kr-sub">({currentAge?.kr})</span>
-                                </div>
-                            </div>
-
-                            {categorizedResults.onsetTime.length > 0 && (
-                                <div className="table-row">
-                                    <div className="table-label">증상 시작<br/>(発症時期)</div>
-                                    <div className="table-content">
-                                        {categorizedResults.onsetTime.map((item, i) => (
-                                            <div key={i}><span className="jp-text">{item.jp}</span><br/><span className="kr-text">({item.kr})</span></div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {categorizedResults.appearance.length > 0 && (
-                                <div className="table-row">
-                                    <div className="table-label">환자 상태<br/>(患者状態)</div>
-                                    <div className="table-content">
-                                        <ul className="medical-result-list">
-                                            {categorizedResults.appearance.map((item, i) => (
-                                                <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="table-row">
-                                <div className="table-label">주요 증상<br/>(主な症状)</div>
-                                <div className="table-content">
-                                    {categorizedResults.main.length === 0 ? (
-                                        <p className="empty-text">선택된 증상이 없습니다.</p>
-                                    ) : (
-                                        <ul className="medical-result-list">
-                                            {categorizedResults.main.map((item, i) => (
-                                                <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </div>
-                            </div>
-
-                            {categorizedResults.excretory.length > 0 && (
-                                <div className="table-row">
-                                    <div className="table-label">소변/대변<br/>(排泄状態)</div>
-                                    <div className="table-content">
-                                        <ul className="medical-result-list">
-                                            {categorizedResults.excretory.map((item, i) => (
-                                                <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                            )}
-
-                            {categorizedResults.medication.length > 0 && (
-                                <div className="table-row">
-                                    <div className="table-label">복용중인 약<br/>(服用中の薬)</div>
-                                    <div className="table-content">
-                                        <ul className="medical-result-list">
-                                            {categorizedResults.medication.map((item, i) => (
-                                                <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-sub">({item.kr})</span></li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                            )}
-
-                            {categorizedResults.allergy.length > 0 && (
-                                <div className="table-row">
-                                    <div className="table-label">알레르기<br/>(アレルギー)</div>
-                                    <div className="table-content">
-                                        <ul className="medical-result-list">
-                                            {categorizedResults.allergy.map((item, i) => (
-                                                <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                            )}
-
-                            {categorizedResults.pastIllness.length > 0 && (
-                                <div className="table-row">
-                                    <div className="table-label">병력<br/>(既往歴)</div>
-                                    <div className="table-content">
-                                        <ul className="medical-result-list">
-                                            {categorizedResults.pastIllness.map((item, i) => (
-                                                <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                            )}
-                        </>
-                    )}
-
-                    <div className="table-row">
-                        <div className="table-label">요청 사항<br/>(備考)</div>
-                        <div className="table-content">
-                            <p className="jp-text">診察と処方をお願いします。</p>
-                            <p className="kr-text">(진찰과 처방을 부탁드립니다.)</p>
+                ) : (
+                    // 열려있을 때 보여줄 전체 문진표 내용
+                    <>
+                        <div className="result-header">
+                            <h3 className="result-card-title">Medical Questionnaire (問診票)</h3>
+                            <button onClick={handleCopy} className={`copy-btn ${isCopied ? 'success' : 'default'}`}>
+                                {isCopied ? "✓ 복사 완료" : "📋 텍스트 복사"}
+                            </button>
                         </div>
-                    </div>
-                </div>
+
+                        <div className="medical-table">
+                            {isPregnant ? (
+                                <>
+                                    <div className="table-row">
+                                        <div className="table-label">환자 상태<br/>(患者状態)</div>
+                                        <div className="table-content highlight">
+                                            <span className="jp-main">{currentAge?.jp}</span>
+                                            <span className="kr-sub">({currentAge?.kr})</span>
+                                        </div>
+                                    </div>
+                                    
+                                    {categorizedResults.appearance.length > 0 && (
+                                        <div className="table-row">
+                                            <div className="table-label">임신 주차<br/>(妊娠週数)</div>
+                                            <div className="table-content">
+                                                {categorizedResults.appearance.map((item, i) => (
+                                                    <div key={i}><span className="jp-text">{item.jp}</span><br/><span className="kr-text">({item.kr})</span></div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="table-row">
+                                        <div className="table-label">주요 증상<br/>(主な症状)</div>
+                                        <div className="table-content">
+                                            <ul className="medical-result-list">
+                                                {categorizedResults.main.map((item, i) => (
+                                                    <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="table-row">
+                                        <div className="table-label">환자 연령<br/>(患者年齢)</div>
+                                        <div className="table-content highlight">
+                                            <span className="jp-main">{currentAge?.jp}</span>
+                                            <span className="kr-sub">({currentAge?.kr})</span>
+                                        </div>
+                                    </div>
+
+                                    {categorizedResults.onsetTime.length > 0 && (
+                                        <div className="table-row">
+                                            <div className="table-label">증상 시작<br/>(発症時期)</div>
+                                            <div className="table-content">
+                                                {categorizedResults.onsetTime.map((item, i) => (
+                                                    <div key={i}><span className="jp-text">{item.jp}</span><br/><span className="kr-text">({item.kr})</span></div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {categorizedResults.appearance.length > 0 && (
+                                        <div className="table-row">
+                                            <div className="table-label">환자 상태<br/>(患者状態)</div>
+                                            <div className="table-content">
+                                                <ul className="medical-result-list">
+                                                    {categorizedResults.appearance.map((item, i) => (
+                                                        <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="table-row">
+                                        <div className="table-label">주요 증상<br/>(主な症状)</div>
+                                        <div className="table-content">
+                                            {categorizedResults.main.length === 0 ? (
+                                                <p className="empty-text">선택된 증상이 없습니다.</p>
+                                            ) : (
+                                                <ul className="medical-result-list">
+                                                    {categorizedResults.main.map((item, i) => (
+                                                        <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {categorizedResults.excretory.length > 0 && (
+                                        <div className="table-row">
+                                            <div className="table-label">소변/대변<br/>(排泄状態)</div>
+                                            <div className="table-content">
+                                                <ul className="medical-result-list">
+                                                    {categorizedResults.excretory.map((item, i) => (
+                                                        <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {categorizedResults.medication.length > 0 && (
+                                        <div className="table-row">
+                                            <div className="table-label">복용중인 약<br/>(服用中の薬)</div>
+                                            <div className="table-content">
+                                                <ul className="medical-result-list">
+                                                    {categorizedResults.medication.map((item, i) => (
+                                                        <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-sub">({item.kr})</span></li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {categorizedResults.allergy.length > 0 && (
+                                        <div className="table-row">
+                                            <div className="table-label">알레르기<br/>(アレルギー)</div>
+                                            <div className="table-content">
+                                                <ul className="medical-result-list">
+                                                    {categorizedResults.allergy.map((item, i) => (
+                                                        <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {categorizedResults.pastIllness.length > 0 && (
+                                        <div className="table-row">
+                                            <div className="table-label">병력<br/>(既往歴)</div>
+                                            <div className="table-content">
+                                                <ul className="medical-result-list">
+                                                    {categorizedResults.pastIllness.map((item, i) => (
+                                                        <li key={i} className="medical-item"><span className="jp-text">・ {item.jp}</span><span className="kr-text">({item.kr})</span></li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
+                            <div className="table-row">
+                                <div className="table-label">요청 사항<br/>(備考)</div>
+                                <div className="table-content">
+                                    <p className="jp-text">診察と処方をお願いします。</p>
+                                    <p className="kr-text">(진찰과 처방을 부탁드립니다.)</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* 💡 문진표 하단 접기 버튼 */}
+                        <button 
+                            onClick={() => setIsQuestionnaireOpen(false)}
+                            style={{
+                                width: '100%', padding: '12px', marginTop: '16px', backgroundColor: '#F3F4F6', 
+                                border: '1px solid #D1D5DB', borderRadius: '8px', color: '#4B5563', 
+                                fontSize: '14px', fontWeight: '700', cursor: 'pointer',
+                                display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px'
+                            }}
+                        >
+                            <span>▲ 문진표 닫기</span>
+                        </button>
+                    </>
+                )}
             </div>
 
-            {/* 💡 핵심 기능 영역 */}
+            {/* 핵심 기능 영역 */}
             <div className="btn-area">
                 <button className="primary-btn location-btn" style={{ backgroundColor: isPregnant ? '#DB2777' : '#3B82F6' }} onClick={() => navigate('/hospitals', { state: { category: isPregnant ? 'obgyn' : 'pediatrics' } })}>📍 {isPregnant ? '근처 산부인과 찾기' : '내 주변 병원 찾기'}</button>
                 {!isPregnant && <button className="primary-btn location-btn" style={{ backgroundColor: '#10B981', marginBottom: '12px' }} onClick={() => navigate('/pharmacies')}>💊 근처 약국 / 드럭스토어 찾기</button>}
@@ -323,81 +353,56 @@ function Result() {
                 <button className="primary-btn" style={{ backgroundColor: '#00C73C', color: 'white', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }} onClick={() => window.open('https://papago.naver.com/?sk=ko&tk=ja', '_blank')}><img src="/images/papago-icon.png" alt="파파고" style={{ width: '20px', height: '20px', borderRadius: '4px', backgroundColor: 'white', padding: '2px' }} />파파고 실시간 번역기 열기</button>
                 <button className="primary-btn" style={{ backgroundColor: "#E5E7EB", color: "#4B5563", marginBottom: '32px' }} onClick={handleGoHome}>🏠 처음으로 돌아가기</button>
 
-                {/* 💡 외부 지원/정부 서비스 그룹 (새로 추가된 섹션) */}
-                <div style={{ padding: '10px 16px 20px 16px', backgroundColor: '#F9FAFB', borderRadius: '12px', border: '1px solid #E5E7EB' }}>
-                    <h4 style={{ fontSize: '16px', fontWeight: '800', color: '#374151', marginBottom: '14px', textAlign: 'center' }}>
+                {/* 외부 지원/정부 서비스 그룹 */}
+                <div style={{ padding: '20px 16px', backgroundColor: '#F9FAFB', borderRadius: '12px', border: '1px solid #E5E7EB' }}>
+                    <h4 style={{ fontSize: '14px', fontWeight: '800', color: '#374151', marginBottom: '12px', textAlign: 'center' }}>
                         🆘 도움이 더 필요하신가요?
                     </h4>
 
-                    {/* 1. JNTO 긴급 가이드 및 24시간 콜센터 */}
                     <button 
                         className="primary-btn" 
                         style={{ 
-                            backgroundColor: '#FEFCE8', // 연한 노란색
-                            border: '1px solid #FDE047', // 노란색 테두리
-                            color: '#854D0E', // 진한 갈색/노란색 텍스트
+                            backgroundColor: '#FEFCE8', 
+                            border: '1px solid #FDE047', 
+                            color: '#854D0E', 
                             marginBottom: '10px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '4px',
-                            padding: '12px',
-                            cursor: 'pointer',
-                            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px',
+                            padding: '12px', cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
                         }} 
                         onClick={() => window.open('https://www.jnto.go.jp/emergency/kor/mi_guide.html', '_blank')}
                     >
-                        <span style={{ fontSize: '14px', fontWeight: '700' }}>
-                            📞 일본 병원 검색 및 통역 지원이 필요하다면?
-                        </span>
-                        <span style={{ fontSize: '12px', fontWeight: '500', color: '#6B7280', textAlign: 'center', wordBreak: 'keep-all' }}>
+                        <span style={{ fontSize: '14px', fontWeight: '700' }}>📞 일본 병원 검색 및 통역 지원이 필요하다면?</span>
+                        <span style={{ fontSize: '12px', fontWeight: '500', textAlign: 'center', wordBreak: 'keep-all', opacity: 0.9 }}>
                             일본관광청(JNTO) 공식 긴급 의료 가이드 & 24시간 콜센터
                         </span>
                     </button>
 
-                    {/* 2. 후생노동성 의료정보넷 (Navii) */}
                     <button 
                         className="primary-btn" 
                         style={{ 
-                            backgroundColor: '#EFF6FF', // 연한 파란색
-                            border: '1px solid #93C5FD', // 파란색 테두리
-                            color: '#1E3A8A', // 진한 파란색 텍스트
+                            backgroundColor: '#EFF6FF', 
+                            border: '1px solid #93C5FD', 
+                            color: '#1E3A8A', 
                             marginBottom: '10px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '4px',
-                            padding: '12px',
-                            cursor: 'pointer',
-                            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px',
+                            padding: '12px', cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
                         }} 
-                        // 💡 pref=13(도쿄)를 빼고 전국 검색 가능한 메인 페이지로 연결
                         onClick={() => window.open('https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2300/initialize', '_blank')}
                     >
-                        <span style={{ fontSize: '14px', fontWeight: '700' }}>
-                            🏥 외국어 지원 종합 병원을 찾고 싶다면?
-                        </span>
-                        <span style={{ fontSize: '12px', fontWeight: '500', color: '#6B7280', textAlign: 'center', wordBreak: 'keep-all' }}>
+                        <span style={{ fontSize: '14px', fontWeight: '700' }}>🏥 외국어 지원 종합 병원을 찾고 싶다면?</span>
+                        <span style={{ fontSize: '12px', fontWeight: '500', textAlign: 'center', wordBreak: 'keep-all', opacity: 0.9 }}>
                             일본 후생노동성 공식 지정 의료정보넷 (Navii)
                         </span>
                     </button>
 
-                    {/* 3. 도쿄해상일동 여행자 보험 */}
                     <button 
                         className="primary-btn" 
                         style={{ 
                             backgroundColor: '#F0FDF4', 
                             border: '1px solid #6EE7B7', 
                             color: '#065F46', 
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '4px',
-                            padding: '12px',
-                            cursor: 'pointer'
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px',
+                            padding: '12px', cursor: 'pointer'
                         }} 
                         onClick={() => window.open('http://t-o.tmnf.jp/t/13190090T9021000000000000UNYUHUKUSENKAI', '_blank')}
                     >
@@ -406,6 +411,8 @@ function Result() {
                         </span>
                         <span style={{ fontSize: '12px', fontWeight: '600', color: '#047857', textAlign: 'center', wordBreak: 'keep-all' }}>
                             입국 후 가입 가능한 외국인 보험 (도쿄해상일동)
+                            <br />
+                            <span style={{ fontSize: '11px', opacity: 0.8, fontWeight: '500' }}>(※ 일본 현지 인터넷 환경에서만 접속 가능)</span>
                         </span>
                     </button>
                 </div>
