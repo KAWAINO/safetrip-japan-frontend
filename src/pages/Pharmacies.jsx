@@ -1,45 +1,26 @@
-// src/pages/Hospitals.jsx
-import { useState, useEffect, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+// src/pages/Pharmacies.jsx
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import './Hospitals.css'; 
-import LocationSearchModal from '../components/LocationSearchModal';
-
-// 💡 스크립트 중복 로드를 방지하고 안전하게 관리하기 위한 전역 Promise
-let googleMapsPromise = null;
+import './Pharmacies.css'; 
+import LocationSearchModal from '../components/LocationSearchModal'; 
+import CouponModal from '../components/CouponModal';
 
 const loadGooglePlacesService = () => {
-    // 이미 구글맵이 완벽하게 로드되어 있다면 즉시 반환
-    if (window.google && window.google.maps && window.google.maps.places) {
-        return Promise.resolve(new window.google.maps.places.PlacesService(document.createElement('div')));
-    }
-
-    // 로드 중이 아니라면 새로운 Promise 생성
-    if (!googleMapsPromise) {
-        googleMapsPromise = new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places&region=JP`;
-            script.async = true;
-            script.defer = true;
-            
-            script.onload = () => {
-                // 💡 스크립트는 로드되었으나 권한 문제로 places 객체가 없을 때의 멈춤 버그 방지
-                if (window.google && window.google.maps && window.google.maps.places) {
-                    resolve(new window.google.maps.places.PlacesService(document.createElement('div')));
-                } else {
-                    reject(new Error("Google Maps API 권한 또는 로드 오류"));
-                }
-            };
-            
-            script.onerror = (error) => {
-                reject(error);
-            };
-            
-            document.head.appendChild(script);
-        });
+  return new Promise((resolve, reject) => {
+    if (window.google && window.google.maps) {
+      resolve(new window.google.maps.places.PlacesService(document.createElement('div')));
+      return;
     }
     
-    return googleMapsPromise;
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => resolve(new window.google.maps.places.PlacesService(document.createElement('div')));
+    script.onerror = (error) => reject(error);
+    document.head.appendChild(script);
+  });
 };
 
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -51,46 +32,26 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
     return R * c;
 };
 
-function Hospitals() {
+function Pharmacies() {
     const navigate = useNavigate();
-    const location = useLocation(); 
-    
-    const category = location.state?.category || 'pediatrics';
+    const [pharmacies, setPharmacies] = useState([]);
+    const [loading, setLoading] = useState(Boolean(navigator.geolocation));
+    const [isNight] = useState(() => {
+        const currentHour = new Date().getHours();
+        return currentHour >= 20 || currentHour < 9;
+    });
+    const [searchType, setSearchType] = useState('drugstore'); 
 
-    const contentMap = {
-        pediatrics: {
-            title: "근처 소아과",
-            keyword: "小児科 Pediatrics", 
-            targetName: "소아과", 
-            themeColor: "#1D4ED8" 
-        },
-        obgyn: {
-            title: "근처 산부인과",
-            keyword: "産婦人科 レディースクリニック OBGYN", 
-            targetName: "산부인과", 
-            themeColor: "#DB2777" 
-        }
-    };
-
-    const currentContent = contentMap[category];
-
-    const [hospitals, setHospitals] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [locationError, setLocationError] = useState(false);
-    const [isOpenOnly, setIsOpenOnly] = useState(true);
-    const [mode, setMode] = useState('normal'); 
-    const [showAmbulanceMsg, setShowAmbulanceMsg] = useState(false);
     const [userLocation, setUserLocation] = useState(null);
+    const [locationError, setLocationError] = useState(!navigator.geolocation);
+
     const [isModalOpen, setIsModalOpen] = useState(false);
+    // 컴포넌트 상단에 쿠폰 모달 상태 추가 
+    const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
     const [searchedLocationName, setSearchedLocationName] = useState("내 주변");
 
-    // 1️⃣ 위치 가져오기 (마운트 시 1회 실행)
     useEffect(() => {
-        if (!navigator.geolocation) {
-            setLocationError(true);
-            setLoading(false);
-            return;
-        }
+        if (!navigator.geolocation) return;
 
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -98,7 +59,6 @@ function Hospitals() {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                 });
-                setLocationError(false);
             },
             (error) => {
                 console.error("GPS 권한 에러:", error);
@@ -107,80 +67,64 @@ function Hospitals() {
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
+        
     }, []);
 
-    // 2️⃣ 병원 검색 API 로직
-    const fetchHospitals = useCallback(async (isRetry = false) => {
-        if (!userLocation) return;
-        
-        setLoading(true);
-
-        try {
-            const placesService = await loadGooglePlacesService();
-            const searchKeyword = isRetry ? '夜間休日急病診療所 救急病院' : currentContent.keyword;
-
-            const request = {
-                // 💡 버그 수정: new google.maps.LatLng 대신 안전한 순수 객체(Literal) 사용
-                location: { lat: userLocation.lat, lng: userLocation.lng }, 
-                radius: isRetry ? 5000 : 3500, 
-                keyword: searchKeyword,
-                openNow: isOpenOnly && !isRetry, 
-                type: ['hospital', 'doctor', 'health'] 
-            };
-
-            placesService.nearbySearch(request, (results, status) => {
-                if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
-                    const formattedData = results.map(place => {
-                        const distance = calculateDistance(
-                            userLocation.lat, userLocation.lng, 
-                            place.geometry.location.lat(), place.geometry.location.lng()
-                        );
-                        return {
-                            id: place.place_id,
-                            nameKr: place.name,
-                            addressKr: place.vicinity || "주소 정보 없음", 
-                            distance: distance,
-                            lat: place.geometry.location.lat(),
-                            lng: place.geometry.location.lng(),
-                            isEmergency: isRetry
-                        };
-                    });
-
-                    formattedData.sort((a, b) => a.distance - b.distance);
-                    setHospitals(formattedData.slice(0, 5));
-                    setMode(isRetry ? 'emergency' : 'normal'); 
-                    setLoading(false);
-                } else {
-                    if (!isRetry && isOpenOnly) {
-                        fetchHospitals(true); 
-                    } else {
-                        setHospitals([]);
-                        setMode('normal');
-                        setLoading(false);
-                    }
-                }
-            });
-        } catch (error) {
-            console.error("구글 맵 API 에러 발생:", error);
-            // 💡 에러 발생 시 무한 로딩에 빠지지 않도록 처리
-            setHospitals([]);
-            setLoading(false);
-        }
-    }, [userLocation, isOpenOnly, currentContent.keyword]);
-
-    // 💡 userLocation이 세팅되면 검색 실행
     useEffect(() => {
-        if (userLocation) {
-            fetchHospitals();
-        }
-    }, [fetchHospitals, userLocation]);
+        if (!userLocation) return;
 
-    // 3️⃣ 수동 검색 함수
+        const fetchPharmacies = async () => {
+            setLoading(true);
+            try {
+                const placesService = await loadGooglePlacesService();
+                const keywordTarget = searchType === 'drugstore' ? '薬局' : '調剤薬局';
+
+                const request = {
+                    location: userLocation,
+                    radius: searchType === 'drugstore' ? 2000 : 3000, 
+                    keyword: keywordTarget, 
+                    openNow: isNight 
+                };
+
+                placesService.nearbySearch(request, (results, status) => {
+                    if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
+                        const formattedData = results.map(place => {
+                            const distance = calculateDistance(
+                                userLocation.lat, userLocation.lng,
+                                place.geometry.location.lat(), place.geometry.location.lng()
+                            );
+                            return {
+                                id: place.place_id,
+                                nameKr: place.name,
+                                addressKr: place.vicinity, 
+                                distance: distance,
+                                lat: place.geometry.location.lat(),
+                                lng: place.geometry.location.lng()
+                            };
+                        });
+
+                        formattedData.sort((a, b) => a.distance - b.distance);
+                        setPharmacies(formattedData.slice(0, 5)); 
+                    } else {
+                        setPharmacies([]); 
+                    }
+                    setLoading(false);
+                });
+
+            } catch (error) {
+                console.error("API 로드 에러:", error);
+                setLoading(false);
+            }
+        };
+
+        fetchPharmacies();
+    }, [userLocation, searchType, isNight]);
+
     const handleManualSearch = async (keyword) => {
         try {
             const placesService = await loadGooglePlacesService();
             const request = {
-                query: keyword + " 日本", 
+                query: keyword + " 일본", 
                 fields: ['name', 'geometry']
             };
 
@@ -191,8 +135,8 @@ function Hospitals() {
                     const lng = place.geometry.location.lng();
                     const locationName = place.name || keyword;
 
-                    setUserLocation({ lat, lng });
-                    setSearchedLocationName(locationName);
+                    setUserLocation({ lat, lng }); 
+                    setSearchedLocationName(locationName); 
                     setIsModalOpen(false); 
                 } else {
                     alert("검색 결과가 없습니다. 지역명을 더 정확히 입력해주세요.");
@@ -204,61 +148,102 @@ function Hospitals() {
         }
     };
 
-    const openDirections = (hospital) => {
-        const encodedName = encodeURIComponent(hospital.nameKr);
-        const url = `https://www.google.com/maps/dir/?api=1&destination=${encodedName}&destination_place_id=${hospital.id}&travelmode=walking`;
-        window.open(url, '_blank'); 
+    const openDirections = (pharmacy) => {
+        const encodedName = encodeURIComponent(pharmacy.nameKr);
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${encodedName}&destination_place_id=${pharmacy.id}`;
+        window.location.assign(url);
     };
 
     const openFullMap = () => {
         if (!userLocation) return;
-        const query = encodeURIComponent(mode === 'emergency' ? '夜間休日急病診療所 救急病院' : currentContent.keyword);
-        const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
-        window.open(url, '_blank'); 
+        const query = encodeURIComponent(searchType === 'drugstore' ? '薬局' : '調剤薬局');
+        const url = `https://www.google.com/maps/search/${query}/@${userLocation.lat},${userLocation.lng},15z`;
+        window.location.assign(url);
     };
 
     return (
         <>
             <Header onBack={() => navigate(-1)} />
             
-            <div className="container hp-container">
+            <div className="container" style={{ alignItems: "flex-start" }}>
                 
-                <h2 className="title hp-title hp-page-title" style={{ color: currentContent.themeColor }}>
-                    {currentContent.title}
+                <h2 className="title" style={{ marginBottom: '12px', width: '100%', textAlign: 'center' }}>
+                    어떤 곳을 찾으시나요?
                 </h2>
                 
-                <div className="hp-search-wrap">
+                {/* 💡 여기가 핵심입니다! justifyContent를 'center'로 변경했습니다. */}
+                <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginBottom: '16px' }}>
                     <button 
                         onClick={() => setIsModalOpen(true)}
-                        className="hp-search-btn"
+                        style={{ padding: '8px 16px', borderRadius: '20px', border: '1px solid #CBD5E1', backgroundColor: '#ffffff', fontSize: '13px', color: '#334155', fontWeight: 'bold', cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
                     >
                         🔍 다른 지역 검색
                     </button>
                 </div>
-                
-                <div className="hp-filter-box">
-                    <span className="hp-filter-text">🏥 현재 진료 중인 곳만 보기</span>
-                    <label className="toggle-switch">
-                        <input 
-                            type="checkbox" 
-                            checked={isOpenOnly} 
-                            onChange={() => setIsOpenOnly(!isOpenOnly)} 
-                            disabled={locationError} 
-                        />
-                        <span className="slider round"></span>
-                    </label>
-                </div>
 
-                <p style={{ fontSize: '14px', color: '#4B5563', margin: '16px 0', textAlign: 'center' }}>
-                    <b>[{searchedLocationName}]</b> 에서 가장 가까운 {currentContent.targetName} 5곳
-                </p>
+                <div className="tab-container">
+                    <button 
+                        onClick={() => setSearchType('drugstore')}
+                        className={`tab-btn ${searchType === 'drugstore' ? 'active-drugstore' : ''}`}
+                    >
+                        💊 약국 (드럭스토어)
+                    </button>
+                    <button 
+                        onClick={() => setSearchType('pharmacy')}
+                        className={`tab-btn ${searchType === 'pharmacy' ? 'active-pharmacy' : ''}`}
+                    >
+                        🏥 조제 약국
+                    </button>
+                </div>
+                
+                {searchType === 'drugstore' ? (
+                    <div className="disclaimer-box day-alert alert-drugstore">
+                        <span className="alert-icon">💊</span>
+                        <p>
+                            <b>일반 상비약</b>을 구매할 수 있습니다.<br/>
+                            {isNight && "🌙 현재 영업 중인 곳만 표시됩니다. 약사 부재 시 일부 약(1류 의약품)은 구매가 불가할 수 있습니다."}
+                        </p>
+                    </div>
+                ) : (
+                    <div className="disclaimer-box day-alert alert-pharmacy">
+                        <span className="alert-icon">🏥</span>
+                        <p>
+                            병원 <b>처방전</b>이 있어야 약을 지을 수 있습니다.<br/>
+                            <span className="sub-desc">(일부 상비약/생활용품을 파는 곳도 있으나, 처방약 조제가 메인입니다.)</span><br/>
+                            {isNight && "🌙 심야에는 영업 중인 조제약국이 거의 없을 수 있습니다."}
+                        </p>
+                    </div>
+                )}
+
+
+                {/* 💸 [수익화 파이프라인] 드럭스토어 탭일 때만 보이는 제휴 배너! */}
+                {/* {searchType === 'drugstore' && (
+                    <div 
+                        className="affiliate-banner"
+                        onClick={() => setIsCouponModalOpen(true)} 
+                    >
+                        <div className="affiliate-content">
+                            <span className="affiliate-badge">관광객 전용 혜택</span>
+                            <h4 className="affiliate-title">🎁 일본 필수 쇼핑 할인 쿠폰북</h4>
+                            <p className="affiliate-desc">마츠키요, 돈키호테 등 면세+추가 할인!</p>
+                        </div>
+                        <div className="affiliate-icon">🛍️</div>
+                    </div>
+                )} */}
+
+
+                {!locationError && userLocation && (
+                    <p style={{ width: '100%', textAlign: 'center', fontSize: '15px', color: '#334155', marginBottom: '16px' }}>
+                        <b>[{searchedLocationName}]</b> 에서 가장 가까운 5곳
+                    </p>
+                )}
 
                 {locationError ? (
-                    <div className="hp-empty-box">
+                    <div style={{ width: '100%', textAlign: 'center', padding: '40px 0' }}>
                         <span className="alert-icon" style={{fontSize: '30px', display: 'block', margin: '0 auto 10px'}}>📍</span>
-                        <p className="hp-empty-title" style={{color: '#111827'}}>위치 정보를 가져올 수 없습니다.</p>
-                        <p className="hp-empty-desc">
-                            내 주변 병원을 찾으려면 스마트폰 설정에서<br/>웹사이트의 <b>[위치(GPS) 권한]</b>을 허용해 주세요.
+                        <p style={{color: '#111827', fontWeight: 'bold', marginBottom: '8px'}}>위치 정보를 가져올 수 없습니다.</p>
+                        <p style={{fontSize: '14px', color: '#6B7280'}}>
+                            내 주변 약국을 찾으려면 스마트폰 설정에서<br/>웹사이트의 <b>[위치(GPS) 권한]</b>을 허용해 주세요.
                         </p>
                         <button 
                             onClick={() => window.location.reload()} 
@@ -268,84 +253,35 @@ function Hospitals() {
                         </button>
                     </div>
                 ) : loading || !userLocation ? ( 
-                    <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                        <p className="hp-loading-text" style={{ color: '#6B7280', fontSize: '15px' }}>
-                            {!userLocation ? '현재 위치를 확인하고 있습니다... 📍' : `주변 ${currentContent.targetName}를 찾고 있습니다... 🔍`}
-                        </p>
-                    </div>
-                ) : hospitals.length === 0 ? (
-                    <div className="hp-empty-box">
-                        <p className="hp-empty-title">
-                            {isOpenOnly ? `현재 진료 중인 ${currentContent.targetName} 및 응급센터가 없습니다.` : `주변에 검색된 ${currentContent.targetName}가 없습니다.`}
-                        </p>
-                        {isOpenOnly && (
-                            <p className="hp-empty-desc">
-                                상단의 필터를 끄고 전체 병원을 확인하거나,<br/>응급 상황 시 119를 이용해 주세요.
-                            </p>
-                        )}
-                    </div>
+                    <p className="loading-text">
+                        {!userLocation ? '현재 위치를 확인하고 있습니다... 📍' : (searchType === 'drugstore' ? '주변 약국을 찾고 있습니다... 🔍' : '주변 조제약국을 찾고 있습니다... 🔍')}
+                    </p>
+                ) : pharmacies.length === 0 ? (
+                    <p className="loading-text">주변에 영업 중인 곳이 없습니다.</p>
                 ) : (
-                    <div className="hospitals-list hp-list-wrap">
-                        {mode === 'emergency' && (
-                            <div className="disclaimer-box hp-emergency-box">
-                                <div className="hp-emergency-header">
-                                    <span className="alert-icon hp-emergency-icon">🚨</span>
-                                    <div className="hp-emergency-text">
-                                        <p className="hp-emergency-title">
-                                            현재 진료 중인 일반 {currentContent.targetName}가 없어 <br/>
-                                            [야간/휴일 응급센터] 위주로 검색되었습니다.
-                                        </p>
-                                        <p className="hp-emergency-sub">
-                                            위급한 상황이라면 주변 현지인(호텔 프론트 등)에게 도움을 요청해 119를 부르세요.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <button 
-                                    className="hp-sos-btn"
-                                    onClick={() => setShowAmbulanceMsg(!showAmbulanceMsg)}
-                                >
-                                    🆘 현지인에게 119 요청하기
-                                </button>
-
-                                {showAmbulanceMsg && (
-                                    <div className="hp-sos-msg-box">
-                                        <p className="hp-sos-msg-guide">주변 일본인에게 이 화면을 보여주세요</p>
-                                        <p className="hp-sos-msg-jp">救急車を呼んでください。</p>
-                                        <p className="hp-sos-msg-kr">(구급차를 불러주세요.)</p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {hospitals.map(hospital => (
-                            <div key={hospital.id} className={`hospital-card ${hospital.isEmergency ? 'hp-card-emergency' : ''}`}>
-                                <div className="hospital-header-row hp-card-header">
+                    <div className="pharmacy-list-wrap">
+                        {pharmacies.map(pharmacy => (
+                            <div key={pharmacy.id} className="hospital-card">
+                                <div className="hospital-header-row">
                                     <div>
-                                        <h3 className="hospital-name-kr hp-card-name">{hospital.nameKr}</h3>
-                                        {hospital.isEmergency && (
-                                            <span className="hp-badge-emergency">야간/응급</span>
-                                        )}
+                                        <h3 className="hospital-name-kr">{pharmacy.nameKr}</h3>
                                     </div>
-                                    <span className="hospital-distance hp-card-dist">
-                                        {hospital.distance.toFixed(1)}km
+                                    <span className={`hospital-distance ${searchType === 'drugstore' ? 'dist-drugstore' : 'dist-pharmacy'}`}>
+                                        {pharmacy.distance.toFixed(1)}km
                                     </span>
                                 </div>
-
-                                <p className="hospital-address hp-card-addr">📍 {hospital.addressKr}</p>
-
+                                <p className="hospital-address">📍 {pharmacy.addressKr}</p>
                                 <button 
-                                    onClick={() => openDirections(hospital)} 
-                                    className={`map-btn ${hospital.isEmergency ? 'hp-btn-emergency' : 'hp-btn-normal'}`}
+                                    onClick={() => openDirections(pharmacy)} 
+                                    className={`map-btn ${searchType === 'drugstore' ? 'btn-drugstore' : 'btn-pharmacy'}`}
                                 >
                                     🗺️ 길찾기 시작
                                 </button>
                             </div>
                         ))}
-
                         <button 
                             onClick={openFullMap} 
-                            className={`full-map-btn ${mode === 'emergency' ? 'hp-full-btn-emergency' : 'hp-full-btn-normal'}`}
+                            className={`full-map-btn ${searchType === 'drugstore' ? 'btn-drugstore' : 'btn-pharmacy-dark'}`}
                         >
                             📍 구글 맵에서 전체 보기
                         </button>
@@ -358,8 +294,14 @@ function Hospitals() {
                 onClose={() => setIsModalOpen(false)} 
                 onSearch={handleManualSearch} 
             />
+
+            {/* 💡 새로 추가한 쿠폰 모달 렌더링 */}
+            <CouponModal 
+                isOpen={isCouponModalOpen} 
+                onClose={() => setIsCouponModalOpen(false)} 
+            />
         </>
     );
 }
 
-export default Hospitals;
+export default Pharmacies;
