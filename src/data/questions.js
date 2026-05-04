@@ -1,5 +1,109 @@
 // src/data/questions.js
 export const questions = {
+  adult: [
+    {
+      id: "department",
+      question: "어느 진료과 병원을 찾으시나요?",
+      type: "single",
+      options: [
+        { label: "🩺 내과 (감기, 발열, 복통, 장염 등)", value: "internal", jp: "内科 (風邪、発熱、腹痛、腸炎など)" },
+        { label: "🦴 정형외과 (뼈, 관절, 근육통, 삐끗함 등)", value: "ortho", jp: "整形外科 (骨、関節、筋肉痛、捻挫など)" }
+      ]
+    },
+    // 💡 내과를 선택했을 때만 나오는 문진표 (조건부 렌더링 적용)
+    {
+      id: "symptoms_internal",
+      question: "어디가 불편하신가요? (해당하는 증상을 모두 선택해주세요)",
+      type: "multi",
+      uiType: "groupedMulti", // 👈 새로운 UI 타입 지정!
+      condition: { dependsOn: "department", values: ["internal"] },
+      groups: [
+        {
+          groupName: "🤒 감기 / 호흡기",
+          options: [
+            { label: "열이 나요", value: "fever", jp: "熱があります。" },
+            { label: "으슬으슬 몸살 기운", value: "chills", jp: "寒気がする/全身がだるいです。" },
+            { label: "기침", value: "cough", jp: "咳が出ます。" },
+            { label: "목이 아파요", value: "sore_throat", jp: "のどが痛いです。" },
+            { label: "숨이 차요", value: "short_breath", jp: "息苦しいです。" }
+          ]
+        },
+        {
+          groupName: "🤢 소화기 / 복부",
+          options: [
+            { label: "복통(배가 아파요)", value: "stomachache", jp: "お腹が痛いです。" },
+            { label: "위통(위가 아파요)", value: "gastric_pain", jp: "胃が痛いです。" },
+            { label: "구역질/메스꺼움", value: "nausea", jp: "吐き気がします。" },
+            { label: "구토", value: "vomit", jp: "嘔吐しました。" },
+            { label: "설사", value: "diarrhea", jp: "下痢をしています。" },
+            { label: "혈변", value: "bloody_stool", jp: "血便が出ました。" }
+          ]
+        },
+        {
+          groupName: "🤕 전신 / 통증 / 기타",
+          options: [
+            { label: "두통", value: "headache", jp: "頭が痛いです。" },
+            { label: "현기증", value: "dizziness", jp: "めまいがします。" },
+            { label: "가슴 통증", value: "chest_pain", jp: "胸が痛いです。" },
+            { label: "두드러기/발진", value: "rash", jp: "発疹・じんましんがあります。" }
+          ]
+        }
+      ]
+    },
+    // 💡 정형외과를 선택했을 때만 나오는 문진표
+    {
+      id: "symptoms_ortho",
+      question: "어디가 아프시거나 다치셨나요? (모두 선택해주세요)",
+      type: "multi",
+      uiType: "groupedMulti",
+      condition: { dependsOn: "department", values: ["ortho"] },
+      groups: [
+        {
+          groupName: "🦴 뼈 / 관절 / 근육",
+          options: [
+            { label: "발목을 삐었어요", value: "sprained_ankle", jp: "足首を捻挫しました。" },
+            { label: "허리를 삐끗했어요", value: "sprained_back", jp: "腰を痛めました(ぎっくり腰)。" },
+            { label: "뼈가 부러진 것 같아요", value: "fracture", jp: "骨折しているかもしれません。" },
+            { label: "관절이 아파요", value: "joint_pain", jp: "関節が痛いです。" },
+            { label: "근육통이 심해요", value: "muscle_pain", jp: "筋肉痛がひどいです。" }
+          ]
+        },
+        {
+          groupName: "🩹 외상 / 기타",
+          options: [
+            { label: "넘어졌어요 (타박상)", value: "bruise", jp: "転んで打撲しました。" },
+            { label: "피가 나요", value: "bleeding", jp: "出血しています。" },
+            { label: "부었어요", value: "swelling", jp: "腫れています。" },
+            { label: "감각이 없거나 저려요", value: "numbness", jp: "しびれがあります。" }
+          ]
+        }
+      ]
+    },
+    // 공통 질문
+    {
+      id: "onset_time",
+      question: "이 증상은 언제부터 시작되었나요?",
+      type: "single",
+      options: [
+        { label: "방금 전부터", value: "just_now", jp: "つい先ほどからです。" },
+        { label: "오늘 아침/오전부터", value: "morning", jp: "今朝（午前中）からです。" },
+        { label: "어젯밤부터", value: "last_night", jp: "昨晩からです。" },
+        { label: "1~2일 전부터", value: "1_2_days", jp: "1〜2日前からです。" },
+        { label: "3일 이상 됨", value: "over_3days", jp: "3日以上前から続いています。" }
+      ]
+    },
+    {
+      id: "allergy_med",
+      question: "약이나 음식 알레르기가 있으신가요?",
+      type: "single",
+      options: [
+        { label: "아니오", value: "alg_no", jp: "アレルギーはありません。" },
+        { label: "약 알레르기 있음", value: "alg_med", jp: "薬のアレルギーがあります。" },
+        { label: "음식 알레르기 있음", value: "alg_food", jp: "食べ物のアレルギーがあります。" }
+      ]
+    }
+  ],
+
   child: [
     {
       id: "fever",

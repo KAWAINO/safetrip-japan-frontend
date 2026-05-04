@@ -51,6 +51,10 @@ function Home() {
         navigate('/question/pregnant');
     };
 
+    const handleAdultClick = () => {
+        navigate('/question/adult');
+    };
+
     return (
         <>
             {/* 뒤로가기 버튼은 landing 단계가 아닐 때만 노출 */}
@@ -157,7 +161,8 @@ function Home() {
                         <div className="title-area">
                             <h1>어디로 가시나요?</h1>
                         </div>
-                        <button className="action-btn hospital-btn" onClick={() => alert('성인 병원 진료 서비스는 준비 중입니다.')}>
+                        {/* <button className="action-btn hospital-btn" onClick={handleAdultClick}> */}
+                        <button className="action-btn hospital-btn" onClick={() => alert('서비스 준비중입니다.')}>
                             <span className="emoji-icon-large">🏥</span>
                             <span>병원 진료 (정밀 문진)</span>
                         </button>

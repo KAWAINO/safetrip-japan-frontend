@@ -113,7 +113,27 @@ function Questions() {
                 <h2 className="title">{currentQuestion.question}</h2>
 
                 <div className="options">
-                    {currentQuestion.uiType === "colorPalette" ? (
+                    {currentQuestion.uiType === "groupedMulti" ? (
+                        // 💡 새로 추가된 카테고리별 칩(Chip) 다중 선택 UI
+                        <div className="grouped-options-container">
+                            {currentQuestion.groups.map((group, gIdx) => (
+                                <div key={gIdx} className="option-group">
+                                    <h4 className="group-title">{group.groupName}</h4>
+                                    <div className="chip-container">
+                                        {group.options.map((option) => (
+                                            <button
+                                                key={option.value}
+                                                className={`chip-btn ${isChecked(option.value) ? "selected" : ""}`}
+                                                onClick={() => handleMultiSelect(option)}
+                                            >
+                                                {option.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : currentQuestion.uiType === "colorPalette" ? (
                         <div className="color-grid">
                             {currentQuestion.options.map((option) => {
                                 const isSelected = answers[currentQuestion.id] === option.value;
